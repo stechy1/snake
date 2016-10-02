@@ -1,7 +1,5 @@
 package cz.zcu.fav.ups.snake.model;
 
-import javafx.scene.canvas.GraphicsContext;
-
 /**
  * Základní kreslitelný objekt
  */
@@ -13,33 +11,57 @@ public abstract class BaseObject {
     // endregion
 
     // region Variables
-    protected Vector2D pos = new Vector2D(); // Pozice
-    protected Vector2D vel = Vector2D.ONES; // Rychlost
-    protected Vector2D dir = Vector2D.RIGHT; // Směr
+    public final Vector2D pos = new Vector2D(); // Pozice
+    public final Vector2D vel = Vector2D.ONES; // Rychlost
+    public final Vector2D dir = Vector2D.RIGHT; // Směr
+
+    public final InputComponent inputComponent;
+    public final PhysicsComponent physicsComponent;
+    public final GraphicsComponent graphicsComponent;
     // endregion
 
     // region Constructors
+//    /**
+//     * Zjednodušený konstruktor herního objektu, který má výchozí souřadnice v bodě [0,0]
+//     */
+//    public BaseObject() {
+//        COUNTER++;
+//    }
+
     /**
-     * Zjednodušený konstruktor herního objektu, který má výchozí souřadnice v bodě [0,0]
+     *
+     *
+     * @param inputComponent
+     * @param physicsComponent
+     * @param graphicsComponent
      */
-    public BaseObject() {
-        COUNTER++;
+    public BaseObject(InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent) {
+        this.inputComponent = inputComponent;
+        this.physicsComponent = physicsComponent;
+        this.graphicsComponent = graphicsComponent;
     }
+
     // endregion
 
-    /**
-     * Metoda, která se zavolá pro aktualizaci stavu objektu
-     *
-     * @param timestamp Doba od posledního updatu
-     */
-    public abstract void update(long timestamp);
+    public void init(World world) {
+        inputComponent.init(world);
+        physicsComponent.init(world);
+        graphicsComponent.init(world);
+    }
 
-    /**
-     * Vykreslí kreslitelný předmět
-     *
-     * @param graphicsContext {@link GraphicsContext}
-     */
-    public abstract void draw(GraphicsContext graphicsContext);
+//    /**
+//     * Metoda, která se zavolá pro aktualizaci stavu objektu
+//     *
+//     * @param timestamp Doba od posledního updatu
+//     */
+//    public abstract void update(long timestamp);
+//
+//    /**
+//     * Vykreslí kreslitelný předmět
+//     *
+//     * @param graphicsContext {@link GraphicsContext}
+//     */
+//    public abstract void draw(GraphicsContext graphicsContext);
 
     // region Getters & Setters
     // endregion

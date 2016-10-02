@@ -42,6 +42,16 @@ public final class Vector2D {
         }
     }
 
+    public static Vector2D RANDOM(double min, double max) {
+        return RANDOM(min, min, max, max);
+    }
+
+    public static Vector2D RANDOM (double minX, double minY, double maxX, double maxY) {
+        double x = minX + (int)(random() * maxX);
+        double y = minY + (int)(random() * maxY);
+        return new Vector2D(x, y);
+    }
+
     public void set(Vector2D other) {
         set(other.x, other.y);
     }
@@ -190,6 +200,11 @@ public final class Vector2D {
             this.y = minY;
 
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Vector2D{x=%s, y=%s}", x, y);
     }
 
     @Override

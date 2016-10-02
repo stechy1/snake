@@ -23,6 +23,7 @@
         <Label fx:id="fpsLabel" />
         <Button onAction="#handleStartBtn" text="Start" />
         <Button onAction="#handleStopBtn" text="Stop" />
+        <Button onAction="#handleStepBtn" text="Krok" />
     </ToolBar>
 
 
