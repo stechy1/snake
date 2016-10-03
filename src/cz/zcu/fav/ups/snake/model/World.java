@@ -2,10 +2,7 @@ package cz.zcu.fav.ups.snake.model;
 
 import cz.zcu.fav.ups.snake.model.food.Food;
 import cz.zcu.fav.ups.snake.model.food.FoodGraphicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.Snake;
-import cz.zcu.fav.ups.snake.model.snake.SnakeGraphicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.SnakePhysicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.SnakeMouseInputComponent;
+import cz.zcu.fav.ups.snake.model.snake.*;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -111,6 +108,7 @@ public final class World {
             graphic.translate((canvas.getWidth() / 2) / SCALE, (canvas.getHeight() / 2) / SCALE);
 
             final double divide = lag / MS_PER_SECOND;
+//            final double divide = 1;
             objects.forEach(object -> object.graphicsComponent.handleDraw(object, graphic, divide));
             foodList.forEach(object -> object.graphicsComponent.handleDraw(object, graphic, divide));
 

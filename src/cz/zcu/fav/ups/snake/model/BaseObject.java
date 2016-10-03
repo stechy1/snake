@@ -8,7 +8,7 @@ public abstract class BaseObject {
     // region Variables
     public final Vector2D pos = new Vector2D(); // Pozice
     public final Vector2D vel = Vector2D.ONES; // Rychlost
-    public final Vector2D dir = Vector2D.RIGHT; // Směr
+    public final Vector2D dir = Vector2D.ZERO; // Směr
 
     public final InputComponent inputComponent;
     public final PhysicsComponent physicsComponent;

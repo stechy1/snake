@@ -1,8 +1,8 @@
 package cz.zcu.fav.ups.snake.model.snake.tail;
 
 import cz.zcu.fav.ups.snake.model.BaseObject;
-import cz.zcu.fav.ups.snake.model.World;
 import cz.zcu.fav.ups.snake.model.GraphicsComponent;
+import cz.zcu.fav.ups.snake.model.World;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -12,7 +12,7 @@ import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 /**
  *
  */
-public class TailGraphicsComponent implements GraphicsComponent {
+public class TailCircleGraphicsComponent implements GraphicsComponent {
 
 
     @Override
@@ -25,9 +25,11 @@ public class TailGraphicsComponent implements GraphicsComponent {
         Tail tail = (Tail) object;
 
         graphicsContext.setFill(Color.CYAN);
-        graphicsContext.fillRect(
-                tail.pos.x - (SIZE / SCALE), tail.pos.y - (SIZE / SCALE),
-                SIZE  / SCALE, SIZE  / SCALE
-        );
+        graphicsContext.fillOval(tail.pos.x - (SIZE / SCALE), tail.pos.y - (SIZE / SCALE),
+                SIZE  / SCALE, SIZE  / SCALE);
+//        graphicsContext.fillRect(
+//                tail.pos.x - (SIZE / SCALE), tail.pos.y - (SIZE / SCALE),
+//                SIZE  / SCALE, SIZE  / SCALE
+//        );
     }
 }
