@@ -10,14 +10,20 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.input.MouseEvent;
 
 /**
- *
+ * Třída představující ovládání hada pomocí myši
  */
 public class SnakeMouseInputComponent implements InputComponent {
 
+    // region Variables
+    // Šířka plátna
     private final IntegerProperty widthProperty = new SimpleIntegerProperty();
+    // Výška plátna
     private final IntegerProperty heightProperty = new SimpleIntegerProperty();
+    // X-ová souřadnice myši
     private final DoubleProperty mouseX = new SimpleDoubleProperty(0);
+    // Y-ová souřadnice myši
     private final DoubleProperty mouseY = new SimpleDoubleProperty(0);
+    // endregion
 
     @Override
     public void init(World world) {
@@ -28,6 +34,11 @@ public class SnakeMouseInputComponent implements InputComponent {
         world.canvas.setOnMouseMoved(this::handleMove);
     }
 
+    /**
+     * Zavolá se pokažde, když se hýbe s myší
+     *
+     * @param mouseEvent {@link MouseEvent}
+     */
     private void handleMove(MouseEvent mouseEvent) {
         mouseX.setValue(mouseEvent.getX());
         mouseY.setValue(mouseEvent.getY());

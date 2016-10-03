@@ -15,14 +15,9 @@ import static cz.zcu.fav.ups.snake.model.snake.Snake.SCALED_SIZE;
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
 /**
- *
+ * Třída představující logiku hada
  */
 public class SnakePhysicsComponent implements PhysicsComponent {
-
-    @Override
-    public void init(World world) {
-
-    }
 
     @Override
     public void handlePhysics(BaseObject object, long lag) {

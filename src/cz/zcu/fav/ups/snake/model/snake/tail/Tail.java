@@ -7,24 +7,22 @@ import cz.zcu.fav.ups.snake.model.InputComponent;
 import cz.zcu.fav.ups.snake.model.PhysicsComponent;
 
 /**
- *
+ * Třída představující jeden kousek těla hada
  */
 public class Tail extends BaseObject {
 
-    public Tail(Vector2D pos, GraphicsComponent graphicsComponent) {
-        this(pos, null, null, graphicsComponent);
-    }
-
+    // region Constructors
     /**
-     * @param inputComponent
-     * @param physicsComponent
-     * @param graphicsComponent
+     * Vytvoří nový kus těla hada
+     *
+     * @param graphicsComponent {@link GraphicsComponent} Komponenta starající se o vykreslení objektu na plátno
      */
-    public Tail(Vector2D pos, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent) {
-        super(inputComponent, physicsComponent, graphicsComponent);
+    public Tail(Vector2D pos, GraphicsComponent graphicsComponent) {
+        super(null, null, graphicsComponent);
 
         this.pos.set(pos);
     }
+    // endregion
 
     @Override
     public String toString() {

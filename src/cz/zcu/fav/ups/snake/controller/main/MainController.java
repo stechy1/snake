@@ -44,19 +44,39 @@ public class MainController implements Initializable {
 //        fpsLabel.textProperty().bind(game.fps.asString("%d"));
     }
 
+    /**
+     * Akce, která se spustí při stisknutí tlačítka "startBtn"
+     *
+     * @param actionEvent {@link ActionEvent}
+     */
     public void handleStartBtn(ActionEvent actionEvent) {
         world.start();
         canvas.requestFocus();
     }
 
+    /**
+     * Akce, která se spustí při stisknutí tlačítka "stopBtn"
+     *
+     * @param actionEvent {@link ActionEvent}
+     */
     public void handleStopBtn(ActionEvent actionEvent) {
         world.stop();
     }
 
+    /**
+     * Akce, která se spustí při stisknutí tlačítka "stepBtn"
+     *
+     * @param actionEvent {@link ActionEvent}
+     */
     public void handleStepBtn(ActionEvent actionEvent) {
         world.step(System.nanoTime());
     }
 
+    /**
+     * Akce, která se spustí při stisknutí tlačítka "noLoop"
+     *
+     * @param actionEvent {@link ActionEvent}
+     */
     public void handleNoLoopBtn(ActionEvent actionEvent) {
         world.noLoop();
     }

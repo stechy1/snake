@@ -10,21 +10,20 @@ import static cz.zcu.fav.ups.snake.model.World.SCALE;
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
 /**
- *
+ * Třída představující grafickou komponentu hada, která vykreslí tělo ve stylu kostičkované duhy
  */
 public class TailRainbowGraphicsComponent implements GraphicsComponent {
 
+    // region Constants
     private static final Color[] tailColors = new Color[] {
             Color.CYAN,
             Color.RED
     };
+    // endregion
 
+    // region Variables
     private static int index = 0;
-
-    @Override
-    public void init(World world) {
-
-    }
+    // endregion
 
     @Override
     public void handleDraw(BaseObject object, GraphicsContext graphicsContext, double divide) {

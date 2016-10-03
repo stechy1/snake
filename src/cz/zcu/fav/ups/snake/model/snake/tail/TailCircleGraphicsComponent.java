@@ -2,7 +2,6 @@ package cz.zcu.fav.ups.snake.model.snake.tail;
 
 import cz.zcu.fav.ups.snake.model.BaseObject;
 import cz.zcu.fav.ups.snake.model.GraphicsComponent;
-import cz.zcu.fav.ups.snake.model.World;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -10,15 +9,9 @@ import static cz.zcu.fav.ups.snake.model.World.SCALE;
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
 /**
- *
+ * Třída představující grafickou komponentu hada, která vykreslí tělo ve stylu malých kruhů
  */
 public class TailCircleGraphicsComponent implements GraphicsComponent {
-
-
-    @Override
-    public void init(World world) {
-
-    }
 
     @Override
     public void handleDraw(BaseObject object, GraphicsContext graphicsContext, double divide) {
@@ -27,9 +20,5 @@ public class TailCircleGraphicsComponent implements GraphicsComponent {
         graphicsContext.setFill(Color.CYAN);
         graphicsContext.fillOval(tail.pos.x - (SIZE / SCALE), tail.pos.y - (SIZE / SCALE),
                 SIZE  / SCALE, SIZE  / SCALE);
-//        graphicsContext.fillRect(
-//                tail.pos.x - (SIZE / SCALE), tail.pos.y - (SIZE / SCALE),
-//                SIZE  / SCALE, SIZE  / SCALE
-//        );
     }
 }
