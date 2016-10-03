@@ -1,5 +1,7 @@
 package cz.zcu.fav.ups.snake.model;
 
+import cz.zcu.fav.ups.snake.model.food.Food;
+import cz.zcu.fav.ups.snake.model.food.FoodGraphicsComponent;
 import cz.zcu.fav.ups.snake.model.snake.Snake;
 import cz.zcu.fav.ups.snake.model.snake.SnakeGraphicsComponent;
 import cz.zcu.fav.ups.snake.model.snake.SnakePhysicsComponent;
@@ -10,6 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,10 +20,16 @@ import java.util.List;
  */
 public final class World {
 
+    public static final float SCALE = 0.2F;
+
     private final MainLoop loop;
     public final Canvas canvas;
+    private boolean noLoop = false;
     
     private final List<BaseObject> objects = new ArrayList<>();
+    private final List<BaseObject> foodList = new ArrayList<>();
+
+    private GraphicsComponent foodGraphicsComponent = new FoodGraphicsComponent();
 
     public World(Canvas canvas) {
         this.canvas = canvas;
@@ -33,6 +42,21 @@ public final class World {
 
         snake.init(this);
         objects.add(snake);
+
+        loadFood();
+    }
+
+    private void loadFood() {
+        double w = canvas.getWidth();
+        double h = canvas.getHeight();
+
+        for (int i = 0; i < 100; i++) {
+            foodList.add(new Food(
+                    Vector2D.RANDOM(
+                            0, 0,
+                            w / SCALE, h / SCALE),
+                    foodGraphicsComponent));
+        }
     }
 
     public void start() {
@@ -43,13 +67,17 @@ public final class World {
         loop.stop();
     }
 
-    public void step(int time) {
+    public void step(long time) {
         loop.handle(time);
+    }
+
+    public void noLoop() {
+        noLoop = true;
     }
 
     private class MainLoop extends AnimationTimer {
 
-        private static final double MS_PER_SECOND = 1000000.0;
+        private static final double MS_PER_SECOND = 10000000.0;
 
         // lag
         private long lag = 0;
@@ -58,9 +86,8 @@ public final class World {
 
         @Override
         public void handle(long now) {
-
             int inLoopTime = 0;
-            long elapsed = now - lastTime;
+            final long elapsed = now - lastTime;
             lastTime = now;
             lag += elapsed;
             objects.forEach(object -> object.inputComponent.handleInput(object));
@@ -79,12 +106,19 @@ public final class World {
             graphic.setStroke(Color.RED);
             graphic.strokeRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-            graphic.translate(canvas.getWidth() / 2, canvas.getHeight() / 2);
+            graphic.scale(SCALE, SCALE);
 
-            double divide = lag / MS_PER_SECOND;
+            graphic.translate((canvas.getWidth() / 2) / SCALE, (canvas.getHeight() / 2) / SCALE);
+
+            final double divide = lag / MS_PER_SECOND;
             objects.forEach(object -> object.graphicsComponent.handleDraw(object, graphic, divide));
+            foodList.forEach(object -> object.graphicsComponent.handleDraw(object, graphic, divide));
 
             graphic.restore();
+
+            if (noLoop) {
+                loop.stop();
+            }
         }
 
         @Override

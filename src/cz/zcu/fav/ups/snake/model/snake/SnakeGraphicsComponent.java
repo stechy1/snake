@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 
 import java.util.List;
 
+import static cz.zcu.fav.ups.snake.model.World.SCALE;
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
 /**
@@ -16,7 +17,7 @@ import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
  */
 public class SnakeGraphicsComponent implements GraphicsComponent {
 
-//    private static final int LINE_LENGTH = 10;
+    private static final int LINE_LENGTH = 10;
 
     @Override
     public void init(World world) {
@@ -30,12 +31,15 @@ public class SnakeGraphicsComponent implements GraphicsComponent {
         graphicsContext.translate(-snake.pos.x, -snake.pos.y);
 
         graphicsContext.setFill(Color.GREEN);
-        graphicsContext.fillRect(snake.pos.x, snake.pos.y, SIZE, SIZE);
+        graphicsContext.fillRect(
+                snake.pos.x + (snake.dir.x * divide) - (SIZE / SCALE), snake.pos.y + (snake.dir.x * divide) - (SIZE / SCALE),
+                SIZE  / SCALE, SIZE  / SCALE
+        );
 
-//        graphicsContext.setStroke(Color.RED);
-//        graphicsContext.strokeLine(
-//                snake.pos.x + (snake.dir.x * divide), snake.pos.y + (snake.dir.y * divide),
-//                snake.pos.x + (snake.dir.x * divide) + snake.dir.x * LINE_LENGTH, snake.pos.y + (snake.dir.y * divide) + snake.dir.y * LINE_LENGTH);
+        graphicsContext.setStroke(Color.RED);
+        graphicsContext.strokeLine(
+                snake.pos.x + (snake.dir.x * divide) - (SIZE / SCALE) / 2, snake.pos.y + (snake.dir.y * divide) - (SIZE / SCALE) / 2,
+                snake.pos.x + (snake.dir.x * divide) + snake.dir.x * LINE_LENGTH / SCALE, snake.pos.y + (snake.dir.y * divide) + snake.dir.y * LINE_LENGTH / SCALE);
 
         List<Tail> tails = snake.tailList;
         tails.forEach(tail -> tail.graphicsComponent.handleDraw(tail, graphicsContext, divide));

@@ -34,7 +34,6 @@ public class MainController implements Initializable {
 
 //    private Game game;
     private World world;
-    private int counter = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -55,6 +54,10 @@ public class MainController implements Initializable {
     }
 
     public void handleStepBtn(ActionEvent actionEvent) {
-        world.step(counter++);
+        world.step(System.nanoTime());
+    }
+
+    public void handleNoLoopBtn(ActionEvent actionEvent) {
+        world.noLoop();
     }
 }

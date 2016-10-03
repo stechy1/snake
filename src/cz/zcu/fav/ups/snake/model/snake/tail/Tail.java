@@ -25,4 +25,9 @@ public class Tail extends BaseObject {
 
         this.pos.set(pos);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Tail{X: %s, Y: %s}", pos.x, pos.y);
+    }
 }

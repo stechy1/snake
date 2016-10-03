@@ -8,14 +8,13 @@ import cz.zcu.fav.ups.snake.model.snake.tail.Tail;
 
 import java.util.List;
 
+import static cz.zcu.fav.ups.snake.model.World.SCALE;
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
 /**
  *
  */
 public class SnakePhysicsComponent implements PhysicsComponent {
-
-    private int total = 4;
 
     @Override
     public void init(World world) {
@@ -29,19 +28,19 @@ public class SnakePhysicsComponent implements PhysicsComponent {
 
         snake.dir.normalize();
 
-        if (total == tails.size()) {
+        // Nesnědl jsem žádné jídlo
+        if (snake.getTotal() == tails.size()) {
             for (int i = 0; i < tails.size() - 1; i++) {
                 tails.set(i, tails.get(i + 1));
             }
         }
 
-        tails.set(total - 1, new Tail(snake.pos, null, null, snake.tailGraphicsComponent));
+//        Vector2D tailPos = Vector2D.mul(snake.pos, SCALE).sub(SIZE / SCALE);
+        Vector2D tailPos = Vector2D.sub(snake.pos, snake.dir.x * (SIZE / SCALE), snake.dir.y * (SIZE / SCALE));
+        //System.out.println(tailPos);
+        tails.set(snake.getTotal() - 1, new Tail(tailPos, snake.tailGraphicsComponent));
 
-        Vector2D newPos = snake.dir.copy().mul(snake.vel.copy()).mul(SIZE);
+        Vector2D newPos = Vector2D.mul(snake.dir, snake.vel).mul(SIZE * SCALE);
         snake.pos.add(newPos);
-    }
-
-    public int getTotal() {
-        return total + 1;
     }
 }

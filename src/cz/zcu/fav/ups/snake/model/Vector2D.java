@@ -5,7 +5,7 @@ import static java.lang.Math.*;
 /**
  * Třída představující 2D vektor
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "SuspiciousNameCombination"})
 public final class Vector2D {
 
     public static final Vector2D ZERO = new Vector2D(0, 0);
@@ -52,6 +52,54 @@ public final class Vector2D {
         return new Vector2D(x, y);
     }
 
+    public static Vector2D add(Vector2D first, Vector2D second) {
+        return add(first, second.x, second.y);
+    }
+
+    public static Vector2D add(Vector2D vector, double value) {
+        return add(vector, value, value);
+    }
+
+    public static Vector2D add(Vector2D vector, double x, double y) {
+        return new Vector2D(vector.x + x, vector.y + y);
+    }
+
+    public static Vector2D sub(Vector2D first, Vector2D second) {
+        return sub(first, second.x, second.y);
+    }
+
+    public static Vector2D sub(Vector2D vector, double value) {
+        return sub(vector, value, value);
+    }
+
+    public static Vector2D sub(Vector2D vector, double x, double y) {
+        return new Vector2D(vector.x - x, vector.y - y);
+    }
+
+    public static Vector2D mul(Vector2D first, Vector2D second) {
+        return mul(first, second.x, second.y);
+    }
+
+    public static Vector2D mul(Vector2D vector, double value) {
+        return mul(vector, value, value);
+    }
+
+    public static Vector2D mul(Vector2D vector, double x, double y) {
+        return new Vector2D(vector.x * x, vector.y * y);
+    }
+
+    public static Vector2D div(Vector2D first, Vector2D second) {
+        return div(first, second.x, second.y);
+    }
+
+    public static Vector2D div(Vector2D vector, double value) {
+        return div(vector, value, value);
+    }
+
+    public static Vector2D div(Vector2D vector, double x, double y) {
+        return new Vector2D(vector.x / x, vector.y / y);
+    }
+
     public void set(Vector2D other) {
         set(other.x, other.y);
     }
@@ -69,6 +117,10 @@ public final class Vector2D {
         return add(other.x, other.y);
     }
 
+    public Vector2D add(double x) {
+        return add(x, x);
+    }
+
     public Vector2D add(double x, double y) {
         this.x += x;
         this.y += y;
@@ -80,6 +132,10 @@ public final class Vector2D {
         return sub(other.x, other.y);
     }
 
+    public Vector2D sub(double x) {
+        return sub(x, x);
+    }
+
     public Vector2D sub(double x, double y) {
         this.x -= x;
         this.y -= y;
@@ -88,22 +144,31 @@ public final class Vector2D {
     }
 
     public Vector2D mul(Vector2D other) {
-        this.x *= other.x;
-        this.y *= other.y;
+        return mul(other.x, other.y);
+    }
+
+    public Vector2D mul(double x) {
+        return mul(x, x);
+    }
+
+    public Vector2D mul(double x, double y) {
+        this.x *= x;
+        this.y *= y;
 
         return this;
     }
 
-    public Vector2D mul(double n) {
-        this.x *= n;
-        this.y *= n;
-
-        return this;
+    public Vector2D div(Vector2D other) {
+        return div(other.x, other.y);
     }
 
-    public Vector2D div(double n) {
-        this.x /= n;
-        this.y /= n;
+    public Vector2D div(double x) {
+        return div(x, x);
+    }
+
+    public Vector2D div(double x, double y) {
+        this.x /= x;
+        this.y /= y;
 
         return this;
     }
