@@ -129,7 +129,7 @@ public final class World {
 
         @Override
         public void handle(long now) {
-            int inLoopTime = 0;
+//            int inLoopTime = 0;
             final long elapsed = now - lastTime;
             lastTime = now;
             lag += elapsed;
@@ -138,10 +138,10 @@ public final class World {
             while (lag >= MS_PER_SECOND) {
                 objects.forEach(object -> object.physicsComponent.handlePhysics(object, lag));
                 lag -= MS_PER_SECOND;
-                inLoopTime++;
+//                inLoopTime++;
             }
 
-            System.out.printf("In loop time: %d%n", inLoopTime);
+//            System.out.printf("In loop time: %d%n", inLoopTime);
 
             GraphicsContext graphic = canvas.getGraphicsContext2D();
             graphic.save();
