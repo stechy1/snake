@@ -100,13 +100,15 @@ public final class Vector2D {
         return new Vector2D(vector.x / x, vector.y / y);
     }
 
-    public void set(Vector2D other) {
-        set(other.x, other.y);
+    public Vector2D set(Vector2D other) {
+        return set(other.x, other.y);
     }
     
-    public void set(double x, double y) {
+    public Vector2D set(double x, double y) {
         this.x = x;
         this.y = y;
+
+        return this;
     }
 
     public Vector2D copy() {
