@@ -1,16 +1,24 @@
 package cz.zcu.fav.ups.snake.model;
 
+import cz.zcu.fav.ups.snake.model.events.DebugEvent;
+import cz.zcu.fav.ups.snake.model.events.GameEvent;
 import cz.zcu.fav.ups.snake.model.food.Food;
 import cz.zcu.fav.ups.snake.model.food.FoodGraphicsComponent;
+import cz.zcu.fav.ups.snake.model.network.ClientInput;
+import cz.zcu.fav.ups.snake.model.network.ClientOutput;
 import cz.zcu.fav.ups.snake.model.snake.*;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Třída představující herní svět
@@ -37,6 +45,14 @@ public final class World {
 
     // Grafická komponenta starající se o vykreslení jídla
     private GraphicsComponent foodGraphicsComponent = new FoodGraphicsComponent();
+
+    public final Queue<GameEvent> inputEventQeue = new ConcurrentLinkedQueue<>();
+    public final Queue<GameEvent> outputEventQeue = new ConcurrentLinkedQueue<>();
+    private final CountDownLatch  inputCounter = new CountDownLatch(1);
+    private final CountDownLatch  outputCounter = new CountDownLatch(1);
+
+    private ClientInput clientInput;
+    private ClientOutput clientOutput;
     // endregion
 
     // region Constructors
@@ -103,11 +119,33 @@ public final class World {
         loop.handle(time);
     }
 
+    public void debug(String message) {
+        GameEvent event = new DebugEvent(message);
+        outputEventQeue.add(event);
+        clientOutput.goWork();
+    }
+
     /**
      * Nastaví příznak aby se herní smyčka spustila pouze jednou
      */
     public void noLoop() {
         noLoop = true;
+    }
+
+    public void connect(LoginModel loginModel) {
+        try {
+            Socket client = new Socket(loginModel.getHost(), loginModel.getPort());
+            InputStream input = client.getInputStream();
+            OutputStream output = client.getOutputStream();
+
+            clientInput = new ClientInput(inputEventQeue, new BufferedInputStream(input));
+            clientOutput = new ClientOutput(outputEventQeue, new DataOutputStream(output));
+            clientInput.start();
+            clientOutput.start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     // endregion
 
