@@ -1,0 +1,25 @@
+buildscript {
+    dependencies {
+        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.7.1-SNAPSHOT'
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    }
+}
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'javafx-gradle-plugin'
+
+
+jfx {
+    mainClass = 'cz.zcu.fav.ups.snake.App'
+    vendor = 'Petr Štechmüller'
+    additionalAppResources = 'src/main/resources'
+    copyAdditionalAppResourcesToJar = true
+}

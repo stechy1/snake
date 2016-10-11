@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/snake.iml" filepath="$PROJECT_DIR$/snake.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/snake.iml" filepath="$PROJECT_DIR$/.idea/modules/snake.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/snake_main.iml" filepath="$PROJECT_DIR$/.idea/modules/snake_main.iml" group="snake" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/snake_test.iml" filepath="$PROJECT_DIR$/.idea/modules/snake_test.iml" group="snake" />
     </modules>
   </component>
 </project>
