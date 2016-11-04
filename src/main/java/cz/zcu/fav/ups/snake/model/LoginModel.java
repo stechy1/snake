@@ -17,7 +17,7 @@ public class LoginModel {
     private final StringProperty username = new SimpleStringProperty("unknown");
     private final StringProperty host = new SimpleStringProperty("192.168.56.1");
     private final IntegerProperty port = new SimpleIntegerProperty(10000);
-    private final BooleanProperty valid = new SimpleBooleanProperty(false);
+    private final BooleanProperty valid = new SimpleBooleanProperty(true);
 
     private int flags;
 
@@ -46,7 +46,7 @@ public class LoginModel {
 
     private final ChangeListener<String> usernameListener = (observable, oldValue, newValue) -> {
         if (newValue.isEmpty()) {
-            System.out.println("Jmeno je nevalidní: " + newValue);
+            System.out.println("Jméno je nevalidní: " + newValue);
             setValidityFlag(FLAG_USERNAME, true);
             setValid(false);
         } else {

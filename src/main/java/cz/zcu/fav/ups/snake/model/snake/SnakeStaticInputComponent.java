@@ -1,8 +1,7 @@
 package cz.zcu.fav.ups.snake.model.snake;
 
-import cz.zcu.fav.ups.snake.model.BaseObject;
+import cz.zcu.fav.ups.snake.model.GameObject;
 import cz.zcu.fav.ups.snake.model.InputComponent;
-import cz.zcu.fav.ups.snake.model.World;
 
 /**
  * Třída představující statický vstup, kde se udržuje výchozí směr hada
@@ -11,7 +10,7 @@ import cz.zcu.fav.ups.snake.model.World;
 public class SnakeStaticInputComponent implements InputComponent {
 
     @Override
-    public void handleInput(BaseObject object) {
+    public void handleInput(GameObject object) {
 
     }
 }

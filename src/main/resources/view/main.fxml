@@ -27,12 +27,12 @@
                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
         </AnchorPane>
         <VBox maxWidth="250" prefWidth="200.0" style="-fx-background-color: lightGrey;">
-            <Label text="Username"/>
-            <TextField fx:id="nameTxtField"/>
-            <Label text="Connect to:"/>
+            <Label text="Přezdívka"/>
+            <TextField fx:id="nameTxtField" promptText="přezdívka"/>
+            <Label text="Připojit se k:"/>
             <HBox>
-                <TextField fx:id="hostTxtField"/>
-                <NumericField fx:id="portNumField"/>
+                <TextField fx:id="hostTxtField" promptText="host"/>
+                <NumericField fx:id="portNumField" promptText="port"/>
             </HBox>
             <padding>
                 <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
@@ -45,6 +45,6 @@
         <Button onAction="#handleStepBtn" text="Krok"/>
         <Button onAction="#handleNoLoopBtn" text="No loop"/>
         <TextField fx:id="debugger"/>
-        <Button fx:id="debugBtn" disable="true" onAction="#handleDebugBtn" text="Send debug text"/>
+        <Button fx:id="debugBtn" disable="true" onAction="#handleDebugBtn" text="Odeslat testovací zprávu"/>
     </ToolBar>
 </VBox>

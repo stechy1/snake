@@ -10,11 +10,11 @@ public interface GraphicsComponent extends IComponent {
     /**
      * Zavolá se, když je potřeba objekt vykreslit
      *
-     * @param object {@link BaseObject} Objekt, který se má vykreslit
+     * @param object {@link GameObject} Objekt, který se má vykreslit
      * @param graphicsContext {@link GraphicsContext}
      * @param divide Interpolace mezi aktuálním a následujícím snímkem
      */
-    void handleDraw(BaseObject object, GraphicsContext graphicsContext, double divide);
+    void handleDraw(GameObject object, GraphicsContext graphicsContext, double divide);
 
 
 }

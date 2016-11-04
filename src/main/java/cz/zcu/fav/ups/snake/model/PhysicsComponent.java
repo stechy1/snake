@@ -8,8 +8,8 @@ public interface PhysicsComponent extends IComponent {
     /**
      * Zavolá se, když je potřeba aktualizovat logiku objektu
      *
-     * @param object {@link BaseObject} Objekt, nad kterým se má aktualizovat logika
+     * @param object {@link GameObject} Objekt, nad kterým se má aktualizovat logika
      * @param lag Rozdíl času mezi předchozím a aktuálním snímkem v nanosekundách
      */
-    void handlePhysics(BaseObject object, long lag);
+    void handlePhysics(GameObject object, long lag);
 }

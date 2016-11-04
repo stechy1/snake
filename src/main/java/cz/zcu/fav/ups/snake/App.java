@@ -7,12 +7,15 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.util.Locale;
+
 /**
  * Vstupní bod aplikace
  */
 public class App extends Application {
 
     public static void main(String[] args) {
+        Locale.setDefault(new Locale("cs"));
         launch(args);
     }
 

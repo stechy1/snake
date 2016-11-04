@@ -8,7 +8,7 @@ public interface InputComponent extends IComponent {
     /**
      * Zavolá se, když příjde čas aktualizovat směr objektu
      *
-     * @param object {@link BaseObject} Objekt, nad kterým se provádí změny
+     * @param object {@link GameObject} Objekt, nad kterým se provádí změny
      */
-    void handleInput(BaseObject object);
+    void handleInput(GameObject object);
 }

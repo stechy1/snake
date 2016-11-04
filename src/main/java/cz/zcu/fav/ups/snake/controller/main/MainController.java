@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.converter.NumberStringConverter;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -21,8 +22,11 @@ import java.util.ResourceBundle;
  */
 public class MainController implements Initializable {
 
+    // region Variables
+    // Příznak který určuje, zda-li jsem ve stavu připojování do hry, či nikoliv
+    private final BooleanProperty connecting = new SimpleBooleanProperty(false);
 
-
+    // region FXML
     // Obalovací prvek pro canvas
     @FXML
     private AnchorPane anchorPane;
@@ -46,10 +50,13 @@ public class MainController implements Initializable {
     private TextField debugger;
     @FXML
     private Button debugBtn;
+    // endregion
 
-//    private Game game;
+    // Svět, ve kterém se hraje
     private World world;
+    // Přihlašovací model
     private LoginModel loginModel;
+    // endregion
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -61,7 +68,10 @@ public class MainController implements Initializable {
         Bindings.bindBidirectional(hostTxtField.textProperty(), loginModel.hostProperty());
         Bindings.bindBidirectional(portNumField.numberProperty(), loginModel.portProperty());
 
-        startBtn.disableProperty().bind(loginModel.validProperty().not());
+        startBtn.disableProperty().bind(Bindings.and(loginModel.validProperty().not(), connecting));
+        startBtn.disableProperty().addListener((observable, oldValue, newValue) -> {
+                    System.out.println("Zmena stavu");
+        });
 
         BooleanProperty disabled = new SimpleBooleanProperty();
         debugger.textProperty().addListener((observable, oldValue, newValue) -> disabled.setValue(newValue.isEmpty()));
@@ -70,15 +80,16 @@ public class MainController implements Initializable {
         world = new World(canvas);
     }
 
+    // region Button handlers
     /**
      * Akce, která se spustí při stisknutí tlačítka "startBtn"
      *
      * @param actionEvent {@link ActionEvent}
      */
     public void handleStartBtn(ActionEvent actionEvent) {
-//        world.connect(loginModel);
-        world.start();
-        canvas.requestFocus();
+        connecting.set(true);
+        world.connect(loginModel, connectedListener);
+//        world.start();
     }
 
     /**
@@ -108,7 +119,34 @@ public class MainController implements Initializable {
         world.noLoop();
     }
 
+    /**
+     * Akce, která se spustí při stisknutí tlačítka "debug"
+     *
+     * @param actionEvent {@link ActionEvent}
+     */
     public void handleDebugBtn(ActionEvent actionEvent) {
         world.debug(debugger.getText());
     }
+    // endregion
+
+    // Listener reagující na výsledek připojení klienta do hry
+    private final World.ConnectedListener connectedListener = new World.ConnectedListener() {
+
+        @Override
+        public void onConnected() {
+            world.start();
+            canvas.requestFocus();
+            connecting.set(false);
+        }
+
+        @Override
+        public void onConnectionFailed() {
+            connecting.set(false);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Chyba.");
+            alert.setHeaderText("Chyba připojení.");
+            alert.setContentText("Nepodařilo se navázat spojení se serverem.");
+            alert.showAndWait();
+        }
+    };
 }

@@ -1,15 +1,19 @@
 package cz.zcu.fav.ups.snake.model.snake.tail;
 
-import cz.zcu.fav.ups.snake.model.BaseObject;
-import cz.zcu.fav.ups.snake.model.Vector2D;
-import cz.zcu.fav.ups.snake.model.GraphicsComponent;
-import cz.zcu.fav.ups.snake.model.InputComponent;
-import cz.zcu.fav.ups.snake.model.PhysicsComponent;
+import cz.zcu.fav.ups.snake.model.*;
+import cz.zcu.fav.ups.snake.model.events.GameEvent;
 
 /**
  * Třída představující jeden kousek těla hada
  */
-public class Tail extends BaseObject {
+public class Tail implements GameObject {
+
+    // region Variables
+    public final Vector2D pos = new Vector2D(); // Pozice
+
+    // Komponenta starající se o vykreslení objektu na plátno
+    public final GraphicsComponent graphicsComponent;
+    // endregion
 
     // region Constructors
     /**
@@ -18,9 +22,8 @@ public class Tail extends BaseObject {
      * @param graphicsComponent {@link GraphicsComponent} Komponenta starající se o vykreslení objektu na plátno
      */
     public Tail(Vector2D pos, GraphicsComponent graphicsComponent) {
-        super(null, null, graphicsComponent);
-
         this.pos.set(pos);
+        this.graphicsComponent = graphicsComponent;
     }
     // endregion
 
@@ -28,4 +31,5 @@ public class Tail extends BaseObject {
     public String toString() {
         return String.format("Tail{X: %s, Y: %s}", pos.x, pos.y);
     }
+
 }

@@ -5,6 +5,6 @@ package cz.zcu.fav.ups.snake.model.events;
  */
 public enum EventType {
 
-    DEBUG, LOGIN, LOST_CONNECTION, LOGOUT;
+    DEBUG, LOGIN, LOST_CONNECTION, LOGOUT
 
 }
