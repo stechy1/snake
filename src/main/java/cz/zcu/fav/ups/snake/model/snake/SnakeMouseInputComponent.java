@@ -1,8 +1,11 @@
 package cz.zcu.fav.ups.snake.model.snake;
 
-import cz.zcu.fav.ups.snake.model.*;
-import cz.zcu.fav.ups.snake.model.events.GameEvent;
-import cz.zcu.fav.ups.snake.model.events.SnakeChangeDirectionEvent;
+import cz.zcu.fav.ups.snake.model.GameObject;
+import cz.zcu.fav.ups.snake.model.InputComponent;
+import cz.zcu.fav.ups.snake.model.Vector2D;
+import cz.zcu.fav.ups.snake.model.World;
+import cz.zcu.fav.ups.snake.model.event.OutputEvent;
+import cz.zcu.fav.ups.snake.model.event.output.SnakeChangeDirectionOutputEvent;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -25,7 +28,7 @@ public class SnakeMouseInputComponent implements InputComponent {
     private final DoubleProperty mouseX = new SimpleDoubleProperty(0);
     // Y-ová souřadnice myši
     private final DoubleProperty mouseY = new SimpleDoubleProperty(0);
-    private Queue<GameEvent> eventQueue;
+    private Queue<OutputEvent> eventQueue;
     // endregion
 
     @Override
@@ -33,7 +36,7 @@ public class SnakeMouseInputComponent implements InputComponent {
         widthProperty.bind(world.canvas.widthProperty());
         heightProperty.bind(world.canvas.heightProperty());
 
-        eventQueue = world.outputEventQeue;
+        eventQueue = world.outputEventQueue;
 
         world.canvas.setOnMouseMoved(this::handleMove);
     }
@@ -81,7 +84,7 @@ public class SnakeMouseInputComponent implements InputComponent {
         snake.dir.normalize();
 
         if (!oldDir.equals(snake.dir))
-            eventQueue.add(new SnakeChangeDirectionEvent(snake.getSnakeID(), snake.dir.copy()));
+            eventQueue.add(new SnakeChangeDirectionOutputEvent(snake.getID(), snake.dir.copy()));
     }
 
 }

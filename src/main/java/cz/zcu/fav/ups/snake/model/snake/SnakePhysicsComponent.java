@@ -1,22 +1,25 @@
 package cz.zcu.fav.ups.snake.model.snake;
 
 import cz.zcu.fav.ups.snake.model.*;
-import cz.zcu.fav.ups.snake.model.events.GameEvent;
 import cz.zcu.fav.ups.snake.model.snake.tail.Tail;
 
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Stack;
 
-import static cz.zcu.fav.ups.snake.model.World.SCALE;
-import static cz.zcu.fav.ups.snake.model.snake.Snake.SCALED_SIZE;
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
 /**
  * Třída představující logiku hada
  */
 public class SnakePhysicsComponent implements PhysicsComponent {
+
+    private int world_width;
+    private int world_height;
+
+    @Override
+    public void init(World world) {
+        world_width = world.getWidth();
+        world_height = world.getHeight();
+    }
 
     @Override
     public void handlePhysics(GameObject object, long lag) {
@@ -31,5 +34,18 @@ public class SnakePhysicsComponent implements PhysicsComponent {
 
         final Vector2D newPos = Vector2D.mul(snake.dir, snake.vel).mul(SIZE);
         snake.pos.add(newPos);
+
+        if (snake.pos.x > world_width) {
+            snake.pos.x = -world_width;
+        }
+        if (snake.pos.x < -world_width) {
+            snake.pos.x = world_width;
+        }
+        if (snake.pos.y > world_height) {
+            snake.pos.y = -world_height;
+        }
+        if (snake.pos.y < -world_height) {
+            snake.pos.y = world_height;
+        }
     }
 }

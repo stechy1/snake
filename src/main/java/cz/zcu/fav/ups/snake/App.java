@@ -1,6 +1,8 @@
 package cz.zcu.fav.ups.snake;
 
+import cz.zcu.fav.ups.snake.controller.main.MainController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,11 +22,18 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/main.fxml"));
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/main.fxml"));
+        Parent root = loader.load();
+        MainController controller = loader.getController();
         Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Multiplayer snake");
-        primaryStage.show();
+        stage.setOnCloseRequest(event -> {
+            controller.onClose();
+            Platform.exit();
+            System.exit(0);
+        });
+        stage.setScene(scene);
+        stage.setTitle("Multiplayer snake");
+        stage.show();
     }
 }

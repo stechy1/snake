@@ -1,30 +1,27 @@
-package cz.zcu.fav.ups.snake.model.events;
+package cz.zcu.fav.ups.snake.model.event.input;
 
 import cz.zcu.fav.ups.snake.model.IUpdatable;
 import cz.zcu.fav.ups.snake.model.Vector2D;
 import cz.zcu.fav.ups.snake.model.World;
-import cz.zcu.fav.ups.snake.model.snake.Snake;
-import cz.zcu.fav.ups.snake.model.snake.SnakeGraphicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.SnakeNetworkInputComponent;
-import cz.zcu.fav.ups.snake.model.snake.SnakePhysicsComponent;
+import cz.zcu.fav.ups.snake.model.event.EventType;
+import cz.zcu.fav.ups.snake.model.event.InputEvent;
+import cz.zcu.fav.ups.snake.model.snake.*;
 import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
 
 /**
- * Třída představující event - přidání hada do hry
+ * Třída představující event přidávající hada do hry
  */
-public class AddSnakeEvent implements GameEvent {
+public class AddSnakeInputEvent implements InputEvent {
 
-    private final int uid;
     private final Snake snake;
 
-    public AddSnakeEvent(int uid, double[] snakeInfo) {
-        this.uid = uid;
+    public AddSnakeInputEvent(double[] snakeInfo) {
         snake = new Snake(
                 (int)snakeInfo[0],
                 (int)snakeInfo[5],
                 new SnakeNetworkInputComponent(),
                 new SnakePhysicsComponent(),
-                new SnakeGraphicsComponent(),
+                new SnakeNetworkGraphicsComponent(),
                 new Vector2D(snakeInfo[1], snakeInfo[2]),
                 new Vector2D(snakeInfo[3], snakeInfo[4]),
                 new TailCircleGraphicsComponent()
@@ -32,20 +29,20 @@ public class AddSnakeEvent implements GameEvent {
     }
 
     @Override
-    public byte[] getBytes() {
-        return new byte[0];
-    }
-
-    @Override
     public void applyEvent(IUpdatable updatable) {
         World world = (World) updatable;
 
-        world.addSnake(uid, snake);
+        world.addSnake(snake);
     }
 
     @Override
-    public int getUserId() {
-        return uid;
+    public int getUserID() {
+        return snake.getID();
+    }
+
+    @Override
+    public String getDescription() {
+        return "AddSnakeInputEvent";
     }
 
     @Override

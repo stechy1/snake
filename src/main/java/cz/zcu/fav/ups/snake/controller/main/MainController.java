@@ -1,7 +1,12 @@
 package cz.zcu.fav.ups.snake.controller.main;
 
+import cz.zcu.fav.ups.snake.controller.OnCloseHanler;
 import cz.zcu.fav.ups.snake.model.LoginModel;
+import cz.zcu.fav.ups.snake.model.Vector2D;
 import cz.zcu.fav.ups.snake.model.World;
+import cz.zcu.fav.ups.snake.model.snake.*;
+import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
+import cz.zcu.fav.ups.snake.model.snake.tail.TailRainbowGraphicsComponent;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,18 +14,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.converter.NumberStringConverter;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
  * Hlavní kontroler
  */
-public class MainController implements Initializable {
+public class MainController implements Initializable, OnCloseHanler {
 
     // region Variables
     // Příznak který určuje, zda-li jsem ve stavu připojování do hry, či nikoliv
@@ -149,4 +155,19 @@ public class MainController implements Initializable {
             alert.showAndWait();
         }
     };
+
+    @Override
+    public void onClose() {
+        world.stop();
+    }
+
+    public void handleSingleplayerBtn(ActionEvent actionEvent) {
+        Snake mySnake = new Snake(1, 500, new SnakeMouseInputComponent(), new SnakePhysicsComponent(), new SnakeGraphicsComponent(), new Vector2D(0, 50), Vector2D.RIGHT(), new TailCircleGraphicsComponent());
+        Snake opponen = new Snake(2, 50, new SnakeNetworkInputComponent(), new SnakePhysicsComponent(), new SnakeNetworkGraphicsComponent(), new Vector2D(0, 0), Vector2D.RIGHT(), new TailRainbowGraphicsComponent());
+
+        world.addSnake(opponen);
+        world.addSnake(mySnake);
+
+        world.startSingleplayer();
+    }
 }

@@ -1,6 +1,8 @@
 package cz.zcu.fav.ups.snake.model;
 
-import cz.zcu.fav.ups.snake.model.events.*;
+
+import cz.zcu.fav.ups.snake.model.event.InputEvent;
+import cz.zcu.fav.ups.snake.model.event.input.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,8 +19,9 @@ public class Protocol {
     private static final String CHANGE_DIR = "changedir";
     private static final String ADD_SNAKE = "addsnake";
     private static final String REMOVE_SNAKE = "remsnake";
+    private static final String SYNC = "sync";
 
-    public static GameEvent parseEvent(String data) {
+    public static InputEvent parseEvent(String data) {
         final int delimiterIndex = data.indexOf(EVENT_DELIMITER);
 
         if (data.contains(INIT)) {
@@ -41,30 +44,37 @@ public class Protocol {
             String foodDataRaw = rawData.substring(0, indexCloseBracket);
             List<double[]> foodInfo = parseValues(foodDataRaw);
 
-            return new InitEvent(snakeInfo, sizeInfo, playersInfo, foodInfo);
+            return new InitInputEvent(snakeInfo, sizeInfo, playersInfo, foodInfo);
         } else if (data.contains(CHANGE_DIR)) {
             final int uid = Integer.parseInt(data.substring(data.indexOf("{") + 1, data.indexOf("}")));
             String rawData = data.substring(delimiterIndex + 1);
             String[] rawVectorArray = rawData.split(VALUE_DELIMITER);
             Vector2D vector = new Vector2D(Double.valueOf(rawVectorArray[0]), Double.valueOf(rawVectorArray[1]));
 
-            return new SnakeChangeDirectionEvent(uid, vector);
+            return new SnakeChangeDirectionInputEvent(uid, vector);
         } else if (data.contains(REMOVE_SNAKE)) {
             final int uid = Integer.parseInt(data.substring(data.indexOf("{") + 1, data.indexOf("}")));
 
-            return new RemoveSnakeEvent(uid);
+            return new RemoveSnakeInputEvent(uid);
         } else if (data.contains(ADD_SNAKE)) {
-            final int uid = Integer.parseInt(data.substring(data.indexOf("{") + 1, data.indexOf("}")));
             String rawData = data.substring(delimiterIndex + 1);
             int indexOpenBracket = rawData.indexOf("{");
             int indexCloseBracket = rawData.indexOf("}");
             String rawPlayerInfo = rawData.substring(indexOpenBracket + 1, indexCloseBracket);
             double[] playerInfo = parseValues(rawPlayerInfo, VALUE_DELIMITER);
 
-            return new AddSnakeEvent(uid, playerInfo);
-        }
+            return new AddSnakeInputEvent(playerInfo);
+        } else if (data.contains(SYNC)) {
+            String rawData = data.substring(delimiterIndex + 1);
+            int indexOpenBracket = rawData.indexOf("{");
+            int indexCloseBracket = rawData.indexOf("}");
+            String snakeDataRaw = rawData.substring(indexOpenBracket + 1, indexCloseBracket);
+            List<double[]> snakeInfo = parseValues(snakeDataRaw);
 
-        throw new IllegalArgumentException("");
+            return new SyncInputEvent(snakeInfo);
+        } else
+
+        throw new IllegalArgumentException("Nebyl rozeznán event: " + data);
     }
 
     private static List<double[]> parseValues(String rawData) {

@@ -1,6 +1,6 @@
 package cz.zcu.fav.ups.snake.model.network;
 
-import cz.zcu.fav.ups.snake.model.events.GameEvent;
+import cz.zcu.fav.ups.snake.model.event.OutputEvent;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,12 +15,12 @@ public class ClientOutput extends Thread {
 
     private final Semaphore semaphore = new Semaphore(0);
 
-    private final Queue<GameEvent> outputEventQeue;
+    private final Queue<OutputEvent> outputEventQeue;
     private final DataOutputStream outputStream;
     private boolean running;
     private boolean interupt;
 
-    public ClientOutput(Queue<GameEvent> outputEventQeue, DataOutputStream outputStream) {
+    public ClientOutput(Queue<OutputEvent> outputEventQeue, DataOutputStream outputStream) {
         this.outputEventQeue = outputEventQeue;
         this.outputStream = outputStream;
         running = false;
@@ -49,10 +49,10 @@ public class ClientOutput extends Thread {
             }
 
             while(!outputEventQeue.isEmpty()) {
-                GameEvent event = outputEventQeue.poll();
+                OutputEvent event = outputEventQeue.poll();
 
                 try {
-                    outputStream.write(event.getBytes());
+                    outputStream.write(event.getData());
                 } catch (IOException e) {
                     e.printStackTrace();
                     running = false;

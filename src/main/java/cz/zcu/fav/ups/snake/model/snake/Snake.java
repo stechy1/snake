@@ -1,11 +1,8 @@
 package cz.zcu.fav.ups.snake.model.snake;
 
 import cz.zcu.fav.ups.snake.model.*;
-import cz.zcu.fav.ups.snake.model.events.GameEvent;
+import cz.zcu.fav.ups.snake.model.event.InputEvent;
 import cz.zcu.fav.ups.snake.model.snake.tail.Tail;
-import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.tail.TailGraphicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.tail.TailRainbowGraphicsComponent;
 
 import java.util.*;
 
@@ -20,18 +17,18 @@ public class Snake implements GameObject, IUpdatable {
     // Výchozí délka ocasu hada
     private static final int DEFAULT_SIZE = 20;
     // Výchozí multiplikátor rychlosti hada
-    private static final float DEFAULT_VELOCITY_MULTIPLIER = 0.7F;
+    private static final float DEFAULT_VELOCITY_MULTIPLIER = 0.05F;
 
     // Výchozí velikost jednoho kusu těla hada
-    public static final int SIZE = 15;
+    public static final int SIZE = 10;
     // Pomocná proměnná
     public static final float SCALED_SIZE = SIZE / SCALE;
     // endregion
 
     // region Variables
     public final Vector2D pos = new Vector2D(); // Pozice
-    public final Vector2D vel = Vector2D.ONES; // Rychlost
-    public final Vector2D dir = Vector2D.ZERO; // Směr
+    public final Vector2D vel = Vector2D.ONES(); // Rychlost
+    public final Vector2D dir = Vector2D.ZERO(); // Směr
     // Komponenta starající se o aktualizaci směru objektu
     public final InputComponent inputComponent;
     // Komponenta starající se o logiku objektu
@@ -40,15 +37,15 @@ public class Snake implements GameObject, IUpdatable {
     public final GraphicsComponent graphicsComponent;
     // Kolekce kousků těla hada
     final LinkedList<Tail> tailList = new LinkedList<>();
-    final LinkedList<GameEvent> events = new LinkedList<>();
+    final LinkedList<InputEvent> events = new LinkedList<>();
 
     // Grafická komponenta starající se o vykreslení těla hada
     final GraphicsComponent tailGraphicsComponent;
 
     // Jednoznačný identifikátor hada
-    private int snakeID;
+    private int id;
     // Počet kusů ocasu
-    private int total;
+    private int score;
     // endregion
 
     // region Constructors
@@ -59,8 +56,8 @@ public class Snake implements GameObject, IUpdatable {
      * @param physicsComponent  {@link PhysicsComponent} Komponenta starající se o logiku objektu
      * @param graphicsComponent {@link GraphicsComponent} Komponenta starající se o vykreslení objektu na plátno
      */
-    public Snake(int id, int total, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent, Vector2D pos, Vector2D dir, GraphicsComponent tailGraphicsComponent) {
-        this.snakeID = id;
+    public Snake(int id, int score, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent, Vector2D pos, Vector2D dir, GraphicsComponent tailGraphicsComponent) {
+        this.id = id;
         this.inputComponent = inputComponent;
         this.physicsComponent = physicsComponent;
         this.graphicsComponent = graphicsComponent;
@@ -68,7 +65,7 @@ public class Snake implements GameObject, IUpdatable {
         this.pos.set(pos);
         this.dir.set(dir);
         vel.mul(DEFAULT_VELOCITY_MULTIPLIER);
-        this.total = total;
+        this.score = score;
     }
     // endregion
 
@@ -77,12 +74,12 @@ public class Snake implements GameObject, IUpdatable {
         physicsComponent.init(world);
         graphicsComponent.init(world);
 
-        for (int i = total; i >= 1; i--) {
+        for (int i = score; i >= 1; i--) {
             tailList.add(new Tail(pos, tailGraphicsComponent));
         }
     }
 
-    public void addEvent(GameEvent event) {
+    public void addEvent(InputEvent event) {
         events.addLast(event);
     }
 
@@ -91,7 +88,15 @@ public class Snake implements GameObject, IUpdatable {
         return String.format("Snake{X: %s, Y: %s}", pos.x, pos.y);
     }
 
-    public int getSnakeID() {
-        return snakeID;
+    public int getID() {
+        return id;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

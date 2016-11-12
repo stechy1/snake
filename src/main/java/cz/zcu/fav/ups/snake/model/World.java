@@ -1,13 +1,16 @@
 package cz.zcu.fav.ups.snake.model;
 
-import cz.zcu.fav.ups.snake.model.events.DebugEvent;
-import cz.zcu.fav.ups.snake.model.events.GameEvent;
-import cz.zcu.fav.ups.snake.model.events.LoginEvent;
+import cz.zcu.fav.ups.snake.model.event.EventType;
+import cz.zcu.fav.ups.snake.model.event.InputEvent;
+import cz.zcu.fav.ups.snake.model.event.OutputEvent;
+import cz.zcu.fav.ups.snake.model.event.output.DebugOutputEvent;
+import cz.zcu.fav.ups.snake.model.event.output.LoginOutputEvent;
+import cz.zcu.fav.ups.snake.model.event.output.LogoutOutputEvent;
 import cz.zcu.fav.ups.snake.model.food.Food;
+import cz.zcu.fav.ups.snake.model.food.FoodGraphicsComponent;
 import cz.zcu.fav.ups.snake.model.network.ClientInput;
 import cz.zcu.fav.ups.snake.model.network.ClientOutput;
-import cz.zcu.fav.ups.snake.model.snake.*;
-import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
+import cz.zcu.fav.ups.snake.model.snake.Snake;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
@@ -27,7 +30,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
 
     // region Constants
     // Globální proměnná představující měřítko, podle kterého se všem objektům upravují velikosti
-    public static final float SCALE = 0.2F;
+    public static final float SCALE = 1F;
     // endregion
 
     // region Variables
@@ -38,23 +41,21 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     public final Canvas canvas;
     // Příznak určující, zda-li se bude herní smyčka opakovat do nekonečna, nebo pouze jednou
     private boolean noLoop = false;
-    private int width = 800;
-    private int height = 600;
+    private int width = 100;
+    private int height = 100;
+    private boolean singleplayer = false;
 
     // Kolekce všech objektů, které se můžou hýbat
-    //private final List<BaseObject> snakesOnMap = new ArrayList<>();
     private final Map<Integer, Snake> snakesOnMap = new HashMap<>();
     private final Map<Integer, Snake> snakesToAdd = new HashMap<>();
     private final List<Integer> snakesToRemove = new LinkedList<>();
     // Kolekce všech jídel - statické objekty
-    //private final List<Food> foodList = new ArrayList<>();
     private final Map<Integer, Food> foodOnMap = new HashMap<>();
     private final Map<Integer, Food> foodToAdd = new HashMap<>();
     private final List<Integer> foodToRemove = new LinkedList<>();
 
-
     // Kolekce odchozích eventů
-    public final Queue<GameEvent> outputEventQeue = new ConcurrentLinkedQueue<>();
+    public final Queue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<>();
 
     private ClientInput clientInput;
     private ClientOutput clientOutput;
@@ -78,8 +79,30 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
 //
 //        snake.init(this);
 //        snakesOnMap.put(1, snake);
+//        generateFood();
+    }
+    // endregion
 
-//        loadFood();
+    // region Private methods
+    private void generateFood() {
+        GraphicsComponent graphicsComponent = new FoodGraphicsComponent();
+        for (int i = 0; i < 100; i++) {
+            foodOnMap.put(i, new Food(i, Vector2D.RANDOM(-width, -height, 2*width, 2*height), graphicsComponent));
+        }
+    }
+    /**
+     * Vyčistí veškeré proměnné
+     */
+    private void clear() {
+        snakesOnMap.clear();
+        snakesToAdd.clear();
+        snakesToRemove.clear();
+        foodOnMap.clear();
+        foodToAdd.clear();
+        foodToRemove.clear();
+        outputEventQueue.clear();
+        clientInput = null;
+        clientOutput = null;
     }
     // endregion
 
@@ -90,6 +113,11 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
      */
     public void start() {
         loop.start();
+    }
+
+    public void startSingleplayer() {
+        singleplayer = true;
+        start();
     }
 
     /**
@@ -109,8 +137,8 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     }
 
     public void debug(String message) {
-        GameEvent event = new DebugEvent(message);
-        outputEventQeue.add(event);
+        OutputEvent event = new DebugOutputEvent(message);
+        outputEventQueue.add(event);
         clientOutput.goWork();
     }
 
@@ -131,8 +159,8 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         new ConnectionThread(loginModel, listener).start();
     }
 
-    public void addSnake(int uid, Snake snake) {
-        snakesToAdd.put(uid, snake);
+    public void addSnake(Snake snake) {
+        snakesToAdd.put(snake.getID(), snake);
     }
 
     public void removeSnake(int uid) {
@@ -165,12 +193,18 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         return this;
     }
 
+    public final Map<Integer, Snake> getSnakesOnMap() {
+        return snakesOnMap;
+    }
+
     @Override
-    public void handleEvent(GameEvent event) {
-        if (event.getType() == GameEvent.EventType.WORLD) {
+    public void handleEvent(InputEvent event) {
+        if (event.getType() == EventType.WORLD) {
             event.applyEvent(this);
         } else {
-            snakesOnMap.get(event.getUserId()).addEvent(event);
+            if (snakesOnMap.containsKey(event.getUserID())) {
+                snakesOnMap.get(event.getUserID()).addEvent(event);
+            }
         }
     }
     // endregion
@@ -189,6 +223,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         private long lag = 0;
         //předchozí čas
         private long lastTime = 0;
+        private boolean running = false;
         // endregion
 
         @Override
@@ -198,7 +233,9 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
             lag += elapsed;
 
             snakesToRemove.forEach(snakesOnMap::remove);
+            foodToRemove.forEach(foodOnMap::remove);
             snakesToRemove.clear();
+            foodToRemove.clear();
 
             snakesOnMap.forEach((uid, object) -> object.inputComponent.handleInput(object));
 
@@ -215,9 +252,6 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
 
             graphic.scale(SCALE, SCALE);
 
-            graphic.strokeRect(-width, -height, width, height);
-            graphic.setFill(Color.LIGHTGRAY);
-            graphic.fillRect(-width, -height, width, height);
             graphic.translate((canvas.getWidth() / 2) / SCALE, (canvas.getHeight() / 2) / SCALE);
 
             final double divide = lag / MS_PER_SECOND;
@@ -228,11 +262,14 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                 snake.init(World.this);
                 snakesOnMap.put(sid, snake);
             });
+            foodToAdd.forEach(foodOnMap::put);
             snakesToAdd.clear();
+            foodToAdd.clear();
 
             graphic.restore();
 
-            clientOutput.goWork();
+            if (!singleplayer)
+                clientOutput.goWork();
 
             if (noLoop) {
                 loop.stop();
@@ -242,7 +279,28 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         @Override
         public void start() {
             lastTime = System.nanoTime();
+            running = true;
             super.start();
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+            if (running) {
+                LogoutOutputEvent event = new LogoutOutputEvent();
+                if (clientOutput != null) {
+                    outputEventQueue.clear();
+                    outputEventQueue.add(event);
+                    clientOutput.goWork();
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            running = false;
+            clear();
         }
     }
 
@@ -263,11 +321,11 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                 InputStream input = client.getInputStream();
                 OutputStream output = client.getOutputStream();
 
-                clientInput = new ClientInput(World.this, new BufferedInputStream(input));
-                clientOutput = new ClientOutput(outputEventQeue, new DataOutputStream(output));
+                clientInput = new ClientInput(World.this, input);
+                clientOutput = new ClientOutput(outputEventQueue, new DataOutputStream(output));
 
                 // Přidám do event qeue přihlašovací event, který se zpracuje při spuštění vlákna
-                outputEventQeue.add(new LoginEvent(loginModel.getUsername()));
+                outputEventQueue.add(new LoginOutputEvent(loginModel.getUsername()));
 
                 clientInput.start();
                 clientOutput.start();

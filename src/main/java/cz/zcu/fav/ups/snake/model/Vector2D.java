@@ -8,12 +8,12 @@ import static java.lang.Math.*;
 @SuppressWarnings({"unused", "SuspiciousNameCombination"})
 public final class Vector2D {
 
-    public static final Vector2D ZERO = new Vector2D(0, 0);
-    public static final Vector2D UP = new Vector2D(0, -1);
-    public static final Vector2D DOWN = new Vector2D(0, 1);
-    public static final Vector2D LEFT = new Vector2D(-1, 0);
-    public static final Vector2D RIGHT = new Vector2D(1, 0);
-    public static final Vector2D ONES = new Vector2D(1, 1);
+    public static Vector2D ZERO() { return new Vector2D(0, 0); }
+    public static Vector2D UP() { return new Vector2D(0, -1); }
+    public static Vector2D DOWN() { return new Vector2D(0, 1); }
+    public static Vector2D LEFT() { return new Vector2D(-1, 0); }
+    public static Vector2D RIGHT() { return new Vector2D(1, 0); }
+    public static Vector2D ONES() { return new Vector2D(1, 1); }
 
     public double x;
     public double y;
@@ -35,10 +35,10 @@ public final class Vector2D {
         int r = (int)round(random()) * 4;
 
         switch (r) {
-            case 0: return UP;
-            case 1: return DOWN;
-            case 2: return LEFT;
-            default: return RIGHT;
+            case 0: return UP();
+            case 1: return DOWN();
+            case 2: return LEFT();
+            default: return RIGHT();
         }
     }
 

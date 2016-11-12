@@ -1,7 +1,6 @@
 package cz.zcu.fav.ups.snake.model.snake.tail;
 
 import cz.zcu.fav.ups.snake.model.*;
-import cz.zcu.fav.ups.snake.model.events.GameEvent;
 
 /**
  * Třída představující jeden kousek těla hada

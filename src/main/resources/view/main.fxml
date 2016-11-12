@@ -44,6 +44,7 @@
         <Button onAction="#handleStopBtn" text="Stop"/>
         <Button onAction="#handleStepBtn" text="Krok"/>
         <Button onAction="#handleNoLoopBtn" text="No loop"/>
+        <Button onAction="#handleSingleplayerBtn" text="Singleplayer" />
         <TextField fx:id="debugger"/>
         <Button fx:id="debugBtn" disable="true" onAction="#handleDebugBtn" text="Odeslat testovací zprávu"/>
     </ToolBar>
