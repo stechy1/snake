@@ -16,7 +16,7 @@ public interface InputEvent {
     /**
      * @return Vrátí userID uživatele, kterého se evet týká
      */
-    int getUserID();
+    String getUserID();
 
     /**
      * @return Vrátí popis eventu

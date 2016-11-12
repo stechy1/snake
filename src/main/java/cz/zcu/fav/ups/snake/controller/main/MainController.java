@@ -162,8 +162,8 @@ public class MainController implements Initializable, OnCloseHanler {
     }
 
     public void handleSingleplayerBtn(ActionEvent actionEvent) {
-        Snake mySnake = new Snake(1, 500, new SnakeMouseInputComponent(), new SnakePhysicsComponent(), new SnakeGraphicsComponent(), new Vector2D(0, 50), Vector2D.RIGHT(), new TailCircleGraphicsComponent());
-        Snake opponen = new Snake(2, 50, new SnakeNetworkInputComponent(), new SnakePhysicsComponent(), new SnakeNetworkGraphicsComponent(), new Vector2D(0, 0), Vector2D.RIGHT(), new TailRainbowGraphicsComponent());
+        Snake mySnake = new Snake("1", 500, new SnakeMouseInputComponent(), new SnakePhysicsComponent(), new SnakeGraphicsComponent(), new Vector2D(0, 50), Vector2D.RIGHT(), new TailCircleGraphicsComponent());
+        Snake opponen = new Snake("2", 50, new SnakeNetworkInputComponent(), new SnakePhysicsComponent(), new SnakeNetworkGraphicsComponent(), new Vector2D(0, 0), Vector2D.RIGHT(), new TailRainbowGraphicsComponent());
 
         world.addSnake(opponen);
         world.addSnake(mySnake);

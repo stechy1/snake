@@ -1,6 +1,7 @@
 package cz.zcu.fav.ups.snake.model.event.input;
 
 import cz.zcu.fav.ups.snake.model.IUpdatable;
+import cz.zcu.fav.ups.snake.model.SnakeInfo;
 import cz.zcu.fav.ups.snake.model.Vector2D;
 import cz.zcu.fav.ups.snake.model.World;
 import cz.zcu.fav.ups.snake.model.event.EventType;
@@ -15,15 +16,15 @@ public class AddSnakeInputEvent implements InputEvent {
 
     private final Snake snake;
 
-    public AddSnakeInputEvent(double[] snakeInfo) {
+    public AddSnakeInputEvent(SnakeInfo snakeInfo) {
         snake = new Snake(
-                (int)snakeInfo[0],
-                (int)snakeInfo[5],
+                snakeInfo.id,
+                snakeInfo.score,
                 new SnakeNetworkInputComponent(),
                 new SnakePhysicsComponent(),
                 new SnakeNetworkGraphicsComponent(),
-                new Vector2D(snakeInfo[1], snakeInfo[2]),
-                new Vector2D(snakeInfo[3], snakeInfo[4]),
+                new Vector2D(snakeInfo.pos),
+                new Vector2D(snakeInfo.dir),
                 new TailCircleGraphicsComponent()
         );
     }
@@ -36,7 +37,7 @@ public class AddSnakeInputEvent implements InputEvent {
     }
 
     @Override
-    public int getUserID() {
+    public String getUserID() {
         return snake.getID();
     }
 

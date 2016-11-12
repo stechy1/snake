@@ -11,10 +11,10 @@ import cz.zcu.fav.ups.snake.model.snake.Snake;
  */
 public class SnakeChangeDirectionInputEvent implements InputEvent {
 
-    private final int uid;
+    private final String uid;
     private final Vector2D dir;
 
-    public SnakeChangeDirectionInputEvent(int uid, Vector2D dir) {
+    public SnakeChangeDirectionInputEvent(String uid, Vector2D dir) {
         this.uid = uid;
         this.dir = dir;
     }
@@ -27,7 +27,7 @@ public class SnakeChangeDirectionInputEvent implements InputEvent {
     }
 
     @Override
-    public int getUserID() {
+    public String getUserID() {
         return uid;
     }
 

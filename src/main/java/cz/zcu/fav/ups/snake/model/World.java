@@ -46,13 +46,13 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     private boolean singleplayer = false;
 
     // Kolekce všech objektů, které se můžou hýbat
-    private final Map<Integer, Snake> snakesOnMap = new HashMap<>();
-    private final Map<Integer, Snake> snakesToAdd = new HashMap<>();
-    private final List<Integer> snakesToRemove = new LinkedList<>();
+    private final Map<String, Snake> snakesOnMap = new HashMap<>();
+    private final Map<String, Snake> snakesToAdd = new HashMap<>();
+    private final List<String> snakesToRemove = new ArrayList<>();
     // Kolekce všech jídel - statické objekty
     private final Map<Integer, Food> foodOnMap = new HashMap<>();
     private final Map<Integer, Food> foodToAdd = new HashMap<>();
-    private final List<Integer> foodToRemove = new LinkedList<>();
+    private final List<Integer> foodToRemove = new ArrayList<>();
 
     // Kolekce odchozích eventů
     public final Queue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<>();
@@ -71,15 +71,6 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     public World(Canvas canvas) {
         this.canvas = canvas;
         loop = new MainLoop();
-
-//        Snake snake = new Snake(1, 25,
-//                new SnakeMouseInputComponent(),
-//                new SnakePhysicsComponent(),
-//                new SnakeGraphicsComponent(), Vector2D.ZERO, Vector2D.RIGHT, new TailCircleGraphicsComponent());
-//
-//        snake.init(this);
-//        snakesOnMap.put(1, snake);
-//        generateFood();
     }
     // endregion
 
@@ -117,6 +108,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
 
     public void startSingleplayer() {
         singleplayer = true;
+        generateFood();
         start();
     }
 
@@ -163,7 +155,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         snakesToAdd.put(snake.getID(), snake);
     }
 
-    public void removeSnake(int uid) {
+    public void removeSnake(String uid) {
         snakesToRemove.add(uid);
     }
 
@@ -193,7 +185,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         return this;
     }
 
-    public final Map<Integer, Snake> getSnakesOnMap() {
+    public final Map<String, Snake> getSnakesOnMap() {
         return snakesOnMap;
     }
 

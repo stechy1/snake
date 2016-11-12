@@ -43,7 +43,7 @@ public class Snake implements GameObject, IUpdatable {
     final GraphicsComponent tailGraphicsComponent;
 
     // Jednoznačný identifikátor hada
-    private int id;
+    private String id;
     // Počet kusů ocasu
     private int score;
     // endregion
@@ -56,7 +56,7 @@ public class Snake implements GameObject, IUpdatable {
      * @param physicsComponent  {@link PhysicsComponent} Komponenta starající se o logiku objektu
      * @param graphicsComponent {@link GraphicsComponent} Komponenta starající se o vykreslení objektu na plátno
      */
-    public Snake(int id, int score, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent, Vector2D pos, Vector2D dir, GraphicsComponent tailGraphicsComponent) {
+    public Snake(String id, int score, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent, Vector2D pos, Vector2D dir, GraphicsComponent tailGraphicsComponent) {
         this.id = id;
         this.inputComponent = inputComponent;
         this.physicsComponent = physicsComponent;
@@ -88,7 +88,7 @@ public class Snake implements GameObject, IUpdatable {
         return String.format("Snake{X: %s, Y: %s}", pos.x, pos.y);
     }
 
-    public int getID() {
+    public String getID() {
         return id;
     }
 

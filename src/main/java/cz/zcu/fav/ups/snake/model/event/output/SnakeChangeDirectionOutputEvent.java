@@ -8,11 +8,9 @@ import cz.zcu.fav.ups.snake.model.event.OutputEvent;
  */
 public class SnakeChangeDirectionOutputEvent implements OutputEvent {
 
-    private final int uid;
     private final Vector2D dir;
 
-    public SnakeChangeDirectionOutputEvent(int uid, Vector2D dir) {
-        this.uid = uid;
+    public SnakeChangeDirectionOutputEvent(Vector2D dir) {
         this.dir = dir;
     }
 

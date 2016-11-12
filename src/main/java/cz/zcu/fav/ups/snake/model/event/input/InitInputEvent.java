@@ -1,9 +1,6 @@
 package cz.zcu.fav.ups.snake.model.event.input;
 
-import cz.zcu.fav.ups.snake.model.GraphicsComponent;
-import cz.zcu.fav.ups.snake.model.IUpdatable;
-import cz.zcu.fav.ups.snake.model.Vector2D;
-import cz.zcu.fav.ups.snake.model.World;
+import cz.zcu.fav.ups.snake.model.*;
 import cz.zcu.fav.ups.snake.model.event.EventType;
 import cz.zcu.fav.ups.snake.model.event.InputEvent;
 import cz.zcu.fav.ups.snake.model.food.Food;
@@ -13,6 +10,7 @@ import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Třída představující inicializační event, který inicializuje celou mapu
@@ -21,23 +19,23 @@ public class InitInputEvent implements InputEvent {
 
     private static final GraphicsComponent tailGraphicComponent = new TailCircleGraphicsComponent();
 
-    private final int mySnakeID;
+    private final String mySnakeID;
     private final List<Snake> snakes = new ArrayList<>();
     private final List<Food> foodList = new ArrayList<>();
     private final double worldWidth;
     private final double worldHeight;
 
-    public InitInputEvent(double[] mySnakeInfo, double[] worldSizeInfo, List<double[]> othersSnakeInfo, List<double[]> foodInfo) {
+    public InitInputEvent(SnakeInfo mySnakeInfo, double[] worldSizeInfo, List<SnakeInfo> othersSnakeInfo, List<FoodInfo> foodInfo) {
+        this.mySnakeID = mySnakeInfo.id;
         System.out.println("Init event");
-        mySnakeID = (int) mySnakeInfo[0];
         Snake mySnake = new Snake(
                 mySnakeID,
-                (int) mySnakeInfo[5],
+                mySnakeInfo.score,
                 new SnakeMouseInputComponent(),
                 new SnakePhysicsComponent(),
                 new SnakeGraphicsComponent(),
-                new Vector2D(mySnakeInfo[1], mySnakeInfo[2]),
-                new Vector2D(mySnakeInfo[3], mySnakeInfo[4]),
+                new Vector2D(mySnakeInfo.pos),
+                new Vector2D(mySnakeInfo.dir),
                 tailGraphicComponent
         );
         snakes.add(0, mySnake);
@@ -45,20 +43,20 @@ public class InitInputEvent implements InputEvent {
         worldHeight = worldSizeInfo[1];
         othersSnakeInfo
                 .stream()
-                .filter(doubles -> (int)doubles[0] != mySnakeInfo[0])
+                .filter(values -> !Objects.equals(values.id, mySnakeID))
                 .forEach(snakeInfo -> snakes.add(new Snake(
-                (int)snakeInfo[0],
-                (int)snakeInfo[5],
+                snakeInfo.id,
+                snakeInfo.score,
                 new SnakeNetworkInputComponent(),
                 new SnakePhysicsComponent(),
                 new SnakeNetworkGraphicsComponent(),
-                new Vector2D(snakeInfo[1], snakeInfo[2]),
-                new Vector2D(snakeInfo[3], snakeInfo[4]),
+                new Vector2D(snakeInfo.pos),
+                new Vector2D(snakeInfo.dir),
                 tailGraphicComponent
         )));
         foodInfo.forEach(oneFoodInfo -> foodList.add(new Food(
-                (int)oneFoodInfo[0],
-                new Vector2D(oneFoodInfo[1], oneFoodInfo[2]),
+                oneFoodInfo.id,
+                new Vector2D(oneFoodInfo.pos),
                 new FoodGraphicsComponent()
         )));
     }
@@ -75,7 +73,7 @@ public class InitInputEvent implements InputEvent {
     }
 
     @Override
-    public int getUserID() {
+    public String getUserID() {
         return mySnakeID;
     }
 

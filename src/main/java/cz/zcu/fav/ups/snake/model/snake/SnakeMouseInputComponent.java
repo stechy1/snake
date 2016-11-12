@@ -84,7 +84,7 @@ public class SnakeMouseInputComponent implements InputComponent {
         snake.dir.normalize();
 
         if (!oldDir.equals(snake.dir))
-            eventQueue.add(new SnakeChangeDirectionOutputEvent(snake.getID(), snake.dir.copy()));
+            eventQueue.add(new SnakeChangeDirectionOutputEvent(snake.dir.copy()));
     }
 
 }

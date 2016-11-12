@@ -29,7 +29,7 @@ public class SnakeNetworkGraphicsComponent implements GraphicsComponent {
 
         graphicsContext.setFill(Color.BLACK);
         String position = String.format("Snake pos: X:%3d,Y:%3d", (int)snake.pos.x, (int)snake.pos.y);
-        graphicsContext.fillText(position, -world_width / 2 + 50, -50 - 10 * (snake.getID() - 5));
+        graphicsContext.fillText(position, -world_width / 2 + 50, -60);
 
         List<Tail> tails = snake.tailList;
         tails.forEach(tail -> tail.graphicsComponent.handleDraw(tail, graphicsContext, divide));

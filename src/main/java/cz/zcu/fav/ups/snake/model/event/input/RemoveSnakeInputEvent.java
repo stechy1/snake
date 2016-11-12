@@ -10,9 +10,9 @@ import cz.zcu.fav.ups.snake.model.event.InputEvent;
  */
 public class RemoveSnakeInputEvent implements InputEvent {
 
-    private final int uid;
+    private final String uid;
 
-    public RemoveSnakeInputEvent(int uid) {
+    public RemoveSnakeInputEvent(String uid) {
         this.uid = uid;
     }
 
@@ -23,7 +23,7 @@ public class RemoveSnakeInputEvent implements InputEvent {
     }
 
     @Override
-    public int getUserID() {
+    public String getUserID() {
         return uid;
     }
 

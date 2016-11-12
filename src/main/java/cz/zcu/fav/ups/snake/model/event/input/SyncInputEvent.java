@@ -1,7 +1,7 @@
 package cz.zcu.fav.ups.snake.model.event.input;
 
 import cz.zcu.fav.ups.snake.model.IUpdatable;
-import cz.zcu.fav.ups.snake.model.Vector2D;
+import cz.zcu.fav.ups.snake.model.SnakeInfo;
 import cz.zcu.fav.ups.snake.model.World;
 import cz.zcu.fav.ups.snake.model.event.EventType;
 import cz.zcu.fav.ups.snake.model.event.InputEvent;
@@ -15,34 +15,29 @@ import java.util.Map;
  */
 public class SyncInputEvent implements InputEvent {
 
-    private final List<double[]> snakesInfo;
+    private final List<SnakeInfo> snakesInfo;
 
-    public SyncInputEvent(List<double[]> snakesInfo) {
+    public SyncInputEvent(List<SnakeInfo> snakesInfo) {
         this.snakesInfo = snakesInfo;
     }
 
     @Override
     public void applyEvent(IUpdatable updatable) {
         World world = (World) updatable;
-        Map<Integer, Snake> snakes = world.getSnakesOnMap();
+        Map<String, Snake> snakes = world.getSnakesOnMap();
 
         snakesInfo.forEach(snakeInfo -> {
-            int index = (int)snakeInfo[0];
-            Vector2D pos = new Vector2D(snakeInfo[1], snakeInfo[2]);
-            Vector2D dir = new Vector2D(snakeInfo[3], snakeInfo[4]);
-            int score = (int)snakeInfo[5];
-
-            Snake snake = snakes.get(index);
-            snake.pos.set(pos);
+            Snake snake = snakes.get(snakeInfo.id);
+            snake.pos.set(snakeInfo.pos);
 //            snake.dir.set(dir);
-            snake.setScore(score);
+            snake.setScore(snakeInfo.score);
         });
 
     }
 
     @Override
-    public int getUserID() {
-        return -1;
+    public String getUserID() {
+        return "";
     }
 
     @Override
