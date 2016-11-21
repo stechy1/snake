@@ -170,4 +170,8 @@ public class MainController implements Initializable, OnCloseHanler {
 
         world.startSingleplayer();
     }
+
+    public void handleLostConnection(ActionEvent actionEvent) {
+        world.simulateLostConnection();
+    }
 }

@@ -26,7 +26,9 @@ public class SyncInputEvent implements InputEvent {
         World world = (World) updatable;
         Map<String, Snake> snakes = world.getSnakesOnMap();
 
-        snakesInfo.forEach(snakeInfo -> {
+        snakesInfo.stream()
+                .filter(snakeInfo -> snakes.get(snakeInfo.id) != null)
+                .forEach(snakeInfo -> {
             Snake snake = snakes.get(snakeInfo.id);
             snake.pos.set(snakeInfo.pos);
 //            snake.dir.set(dir);

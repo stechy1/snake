@@ -23,3 +23,7 @@ jfx {
     additionalAppResources = 'src/main/resources'
     //copyAdditionalAppResourcesToJar = true
 }
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+}

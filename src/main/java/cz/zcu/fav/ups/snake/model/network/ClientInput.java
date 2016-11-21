@@ -16,17 +16,27 @@ public class ClientInput extends Thread {
 
     private final IEventHandler eventHandler;
     private final BufferedReader reader;
+    private boolean interupt = false;
 
     public ClientInput(IEventHandler eventHandler, InputStream inputStream) {
         this.eventHandler = eventHandler;
         this.reader = new BufferedReader(new InputStreamReader(inputStream));
     }
 
+    public void shutdown() {
+        interupt = true;
+        try {
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         try {
             String received;
-            while((received = reader.readLine()) != null) {
+            while((received = reader.readLine()) != null && !interupt) {
                 try {
                     InputEvent event = Protocol.parseEvent(received);
                     eventHandler.handleEvent(event);

@@ -5,7 +5,7 @@ import static java.lang.Math.*;
 /**
  * Třída představující 2D vektor
  */
-@SuppressWarnings({"unused", "SuspiciousNameCombination"})
+@SuppressWarnings({"unused", "SuspiciousNameCombination", "WeakerAccess"})
 public final class Vector2D {
 
     public static Vector2D ZERO() { return new Vector2D(0, 0); }

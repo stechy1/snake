@@ -47,5 +47,6 @@
         <Button onAction="#handleSingleplayerBtn" text="Singleplayer" />
         <TextField fx:id="debugger"/>
         <Button fx:id="debugBtn" disable="true" onAction="#handleDebugBtn" text="Odeslat testovací zprávu"/>
+        <Button onAction="#handleLostConnection" text="Lost connection" />
     </ToolBar>
 </VBox>

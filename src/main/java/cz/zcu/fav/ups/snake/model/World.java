@@ -17,7 +17,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.*;
@@ -34,17 +37,13 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     // endregion
 
     // region Variables
-
-    // Herní smyčka
-    private final MainLoop loop;
+    private static int localPort = -1;
     // Plátno, na které se kreslí
     public final Canvas canvas;
-    // Příznak určující, zda-li se bude herní smyčka opakovat do nekonečna, nebo pouze jednou
-    private boolean noLoop = false;
-    private int width = 100;
-    private int height = 100;
-    private boolean singleplayer = false;
-
+    // Kolekce odchozích eventů
+    public final Queue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<>();
+    // Herní smyčka
+    private final MainLoop loop;
     // Kolekce všech objektů, které se můžou hýbat
     private final Map<String, Snake> snakesOnMap = new HashMap<>();
     private final Map<String, Snake> snakesToAdd = new HashMap<>();
@@ -53,16 +52,18 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     private final Map<Integer, Food> foodOnMap = new HashMap<>();
     private final Map<Integer, Food> foodToAdd = new HashMap<>();
     private final List<Integer> foodToRemove = new ArrayList<>();
-
-    // Kolekce odchozích eventů
-    public final Queue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<>();
-
+    // Příznak určující, zda-li se bude herní smyčka opakovat do nekonečna, nebo pouze jednou
+    private boolean noLoop = false;
+    private int width = 100;
+    private int height = 100;
+    private boolean singleplayer = false;
+    private boolean running = false;
+    private String mySnakeID;
     private ClientInput clientInput;
     private ClientOutput clientOutput;
     // endregion
 
     // region Constructors
-
     /**
      * Vytvoří novou instanci světa
      *
@@ -78,9 +79,13 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     private void generateFood() {
         GraphicsComponent graphicsComponent = new FoodGraphicsComponent();
         for (int i = 0; i < 100; i++) {
-            foodOnMap.put(i, new Food(i, Vector2D.RANDOM(-width, -height, 2*width, 2*height), graphicsComponent));
+            foodOnMap.put(i, new Food(i, Vector2D.RANDOM(-width, -height, 2 * width, 2 * height), graphicsComponent));
         }
     }
+    // endregion
+
+    // region Public methods
+
     /**
      * Vyčistí veškeré proměnné
      */
@@ -95,14 +100,15 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         clientInput = null;
         clientOutput = null;
     }
-    // endregion
-
-    // region Public methods
 
     /**
      * Spustí herní smyčku
      */
     public void start() {
+        if (running) {
+            return;
+        }
+
         loop.start();
     }
 
@@ -117,6 +123,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
      */
     public void stop() {
         loop.stop();
+        localPort = -1;
     }
 
     /**
@@ -145,10 +152,19 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
      * Připojí hráče do hry
      *
      * @param loginModel Přihlašovací údaje
-     * @param listener @{@link ConnectedListener} Listener, který se používá pro handle připojení
+     * @param listener   @{@link ConnectedListener} Listener, který se používá pro handle připojení
      */
     public void connect(LoginModel loginModel, ConnectedListener listener) {
         new ConnectionThread(loginModel, listener).start();
+    }
+
+    public void simulateLostConnection() {
+        if (clientInput != null) {
+            clientInput.shutdown();
+        }
+        if (clientOutput != null) {
+            clientOutput.shutdown();
+        }
     }
 
     public void addSnake(Snake snake) {
@@ -189,6 +205,11 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         return snakesOnMap;
     }
 
+    public void setMySnakeID(String mySnakeID) {
+        this.mySnakeID = mySnakeID;
+    }
+    // endregion
+
     @Override
     public void handleEvent(InputEvent event) {
         if (event.getType() == EventType.WORLD) {
@@ -199,7 +220,14 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
             }
         }
     }
-    // endregion
+
+    public interface ConnectedListener {
+        default void onConnected() {
+        }
+
+        default void onConnectionFailed() {
+        }
+    }
 
     /**
      * Třída představující herní smyčku světa
@@ -215,7 +243,6 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         private long lag = 0;
         //předchozí čas
         private long lastTime = 0;
-        private boolean running = false;
         // endregion
 
         @Override
@@ -247,7 +274,19 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
             graphic.translate((canvas.getWidth() / 2) / SCALE, (canvas.getHeight() / 2) / SCALE);
 
             final double divide = lag / MS_PER_SECOND;
-            snakesOnMap.forEach((uid, object) -> object.graphicsComponent.handleDraw(object, graphic, divide));
+            snakesOnMap.entrySet().stream()
+                    .filter(stringSnakeEntry -> stringSnakeEntry.getKey().equals(mySnakeID))
+                    .findFirst()
+                    .ifPresent(stringSnakeEntry -> {
+                        Snake snake = stringSnakeEntry.getValue();
+                        snake.graphicsComponent.handleDraw(snake, graphic, divide);
+                    });
+            snakesOnMap.entrySet().stream()
+                    .filter(stringSnakeEntry -> !stringSnakeEntry.getKey().equals(mySnakeID))
+                    .forEach((stringSnakeEntry) -> {
+                        Snake snake = stringSnakeEntry.getValue();
+                        snake.graphicsComponent.handleDraw(snake, graphic, divide);
+                    });
             foodOnMap.forEach((uid, food) -> food.graphicsComponent.handleDraw(food, graphic, divide));
 
             snakesToAdd.forEach((sid, snake) -> {
@@ -260,7 +299,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
 
             graphic.restore();
 
-            if (!singleplayer)
+            if (!singleplayer && clientOutput != null)
                 clientOutput.goWork();
 
             if (noLoop) {
@@ -309,7 +348,13 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         @Override
         public void run() {
             try {
-                Socket client = new Socket(InetAddress.getByName(loginModel.getHost()), loginModel.getPort());
+                Socket client;
+                if (localPort != -1) {
+                    client = new Socket(InetAddress.getByName(loginModel.getHost()), loginModel.getPort(), InetAddress.getLocalHost(), localPort);
+                } else {
+                    client = new Socket(InetAddress.getByName(loginModel.getHost()), loginModel.getPort());
+                    localPort = client.getLocalPort();
+                }
                 InputStream input = client.getInputStream();
                 OutputStream output = client.getOutputStream();
 
@@ -327,6 +372,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                     if (mListener != null) {
                         mListener.onConnectionFailed();
                     }
+                    ex.printStackTrace();
                 });
                 return;
             }
@@ -335,14 +381,6 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                 if (mListener != null)
                     mListener.onConnected();
             });
-        }
-    }
-
-    public interface ConnectedListener {
-        default void onConnected() {
-        }
-
-        default void onConnectionFailed() {
         }
     }
 }

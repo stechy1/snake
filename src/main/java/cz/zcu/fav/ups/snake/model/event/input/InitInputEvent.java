@@ -19,17 +19,16 @@ public class InitInputEvent implements InputEvent {
 
     private static final GraphicsComponent tailGraphicComponent = new TailCircleGraphicsComponent();
 
-    private final String mySnakeID;
+    private final Snake mySnake;
     private final List<Snake> snakes = new ArrayList<>();
     private final List<Food> foodList = new ArrayList<>();
     private final double worldWidth;
     private final double worldHeight;
 
     public InitInputEvent(SnakeInfo mySnakeInfo, double[] worldSizeInfo, List<SnakeInfo> othersSnakeInfo, List<FoodInfo> foodInfo) {
-        this.mySnakeID = mySnakeInfo.id;
         System.out.println("Init event");
-        Snake mySnake = new Snake(
-                mySnakeID,
+        this.mySnake = new Snake(
+                mySnakeInfo.id,
                 mySnakeInfo.score,
                 new SnakeMouseInputComponent(),
                 new SnakePhysicsComponent(),
@@ -38,12 +37,12 @@ public class InitInputEvent implements InputEvent {
                 new Vector2D(mySnakeInfo.dir),
                 tailGraphicComponent
         );
-        snakes.add(0, mySnake);
+        snakes.add(mySnake);
         worldWidth = worldSizeInfo[0];
         worldHeight = worldSizeInfo[1];
         othersSnakeInfo
                 .stream()
-                .filter(values -> !Objects.equals(values.id, mySnakeID))
+                .filter(values -> !Objects.equals(values.id, mySnakeInfo.id))
                 .forEach(snakeInfo -> snakes.add(new Snake(
                 snakeInfo.id,
                 snakeInfo.score,
@@ -68,13 +67,14 @@ public class InitInputEvent implements InputEvent {
         world.setHeight((int)worldHeight);
 
         world.getSnakesOnMap().clear();
+        world.setMySnakeID(mySnake.getID());
         snakes.forEach(world::addSnake);
         foodList.forEach(food -> world.addFood(food.id, food));
     }
 
     @Override
     public String getUserID() {
-        return mySnakeID;
+        return mySnake.getID();
     }
 
     @Override

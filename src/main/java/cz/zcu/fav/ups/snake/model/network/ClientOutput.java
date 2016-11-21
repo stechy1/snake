@@ -10,7 +10,6 @@ import java.util.concurrent.Semaphore;
 /**
  * Třída představující vlákno, které posílá data ven na server
  */
-@SuppressWarnings("InfiniteLoopStatement")
 public class ClientOutput extends Thread {
 
     private final Semaphore semaphore = new Semaphore(0);
@@ -35,6 +34,17 @@ public class ClientOutput extends Thread {
         semaphore.release();
     }
 
+    public void shutdown() {
+        interupt = true;
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        outputEventQeue.clear();
+        semaphore.release();
+    }
+
     @Override
     public void run() {
         while(!interupt) {
@@ -54,12 +64,12 @@ public class ClientOutput extends Thread {
                 try {
                     outputStream.write(event.getData());
                 } catch (IOException e) {
-                    e.printStackTrace();
                     running = false;
                     interupt = true;
                     break;
                 }
             }
         }
+
     }
 }

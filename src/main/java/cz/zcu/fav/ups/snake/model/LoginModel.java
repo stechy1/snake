@@ -3,8 +3,6 @@ package cz.zcu.fav.ups.snake.model;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 
-import java.util.regex.Pattern;
-
 /**
  * jednoduchý model představující přihlašovací údaje k serveru
  */
