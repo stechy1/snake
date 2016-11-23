@@ -20,9 +20,10 @@ public class SnakeGraphicsComponent implements GraphicsComponent {
         Snake snake = (Snake) object;
 
         graphicsContext.setFill(Color.BLACK);
-        String position = String.format("Snake pos: X:%3d,Y:%3d", (int)snake.pos.x, (int)snake.pos.y);
+        String name = snake.getName();
+        float width = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(name, graphicsContext.getFont());
+
         graphicsContext.translate(-snake.pos.x, -snake.pos.y);
-        graphicsContext.fillText(position, snake.pos.x - position.length() / 2, snake.pos.y + 20);
 
         List<Tail> tails = snake.tailList;
         tails.forEach(tail -> tail.graphicsComponent.handleDraw(tail, graphicsContext, divide));
@@ -34,5 +35,6 @@ public class SnakeGraphicsComponent implements GraphicsComponent {
                 SCALED_SIZE,
                 SCALED_SIZE
         );
+        graphicsContext.fillText(name, snake.pos.x - width / 2, snake.pos.y + 20);
     }
 }

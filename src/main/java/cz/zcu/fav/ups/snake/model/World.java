@@ -283,6 +283,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                         Snake snake = stringSnakeEntry.getValue();
                         snake.graphicsComponent.handleDraw(snake, graphics, divide);
                     });
+
             snakesOnMap.entrySet().stream()
                     .filter(stringSnakeEntry -> !stringSnakeEntry.getKey().equals(mySnakeID))
                     .forEach((stringSnakeEntry) -> {
