@@ -124,6 +124,8 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     public void stop() {
         loop.stop();
         localPort = -1;
+        GraphicsContext graphics = canvas.getGraphicsContext2D();
+        graphics.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     /**
@@ -263,15 +265,15 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                 lag -= MS_PER_SECOND;
             }
 
-            GraphicsContext graphic = canvas.getGraphicsContext2D();
-            graphic.save();
-            graphic.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            graphic.setStroke(Color.RED);
-            graphic.strokeRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            GraphicsContext graphics = canvas.getGraphicsContext2D();
+            graphics.save();
+            graphics.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            graphics.setStroke(Color.RED);
+            graphics.strokeRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-            graphic.scale(SCALE, SCALE);
+            graphics.scale(SCALE, SCALE);
 
-            graphic.translate((canvas.getWidth() / 2) / SCALE, (canvas.getHeight() / 2) / SCALE);
+            graphics.translate((canvas.getWidth() / 2) / SCALE, (canvas.getHeight() / 2) / SCALE);
 
             final double divide = lag / MS_PER_SECOND;
             snakesOnMap.entrySet().stream()
@@ -279,15 +281,15 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                     .findFirst()
                     .ifPresent(stringSnakeEntry -> {
                         Snake snake = stringSnakeEntry.getValue();
-                        snake.graphicsComponent.handleDraw(snake, graphic, divide);
+                        snake.graphicsComponent.handleDraw(snake, graphics, divide);
                     });
             snakesOnMap.entrySet().stream()
                     .filter(stringSnakeEntry -> !stringSnakeEntry.getKey().equals(mySnakeID))
                     .forEach((stringSnakeEntry) -> {
                         Snake snake = stringSnakeEntry.getValue();
-                        snake.graphicsComponent.handleDraw(snake, graphic, divide);
+                        snake.graphicsComponent.handleDraw(snake, graphics, divide);
                     });
-            foodOnMap.forEach((uid, food) -> food.graphicsComponent.handleDraw(food, graphic, divide));
+            foodOnMap.forEach((uid, food) -> food.graphicsComponent.handleDraw(food, graphics, divide));
 
             snakesToAdd.forEach((sid, snake) -> {
                 snake.init(World.this);
@@ -297,7 +299,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
             snakesToAdd.clear();
             foodToAdd.clear();
 
-            graphic.restore();
+            graphics.restore();
 
             if (!singleplayer && clientOutput != null)
                 clientOutput.goWork();
