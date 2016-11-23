@@ -6,6 +6,7 @@ package cz.zcu.fav.ups.snake.model;
 public final class SnakeInfo {
 
     public final String id;
+    public String username;
     public final int score;
     public final Vector2D pos;
     public final Vector2D dir;

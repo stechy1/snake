@@ -12,10 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static cz.zcu.fav.ups.snake.model.Protocol.*;
+
 /**
  * Třída představující inicializační event, který inicializuje celou mapu
  */
 public class InitInputEvent implements InputEvent {
+
+    private static final int INDEX_SNAKE_FOOD_ID = 0;
+    private static final int INDEX_SNAKE_FOOD_POS_X = 1;
+    private static final int INDEX_SNAKE_FOOD_POS_Y = 2;
 
     private static final GraphicsComponent tailGraphicComponent = new TailCircleGraphicsComponent();
 
@@ -25,37 +31,39 @@ public class InitInputEvent implements InputEvent {
     private final double worldWidth;
     private final double worldHeight;
 
-    public InitInputEvent(SnakeInfo mySnakeInfo, double[] worldSizeInfo, List<SnakeInfo> othersSnakeInfo, List<FoodInfo> foodInfo) {
+    public InitInputEvent(String[] mySnakeInfo, String[] worldSizeInfo, List<String[]> othersSnakeInfo, List<String[]> foodInfo) {
         System.out.println("Init event");
         this.mySnake = new Snake(
-                mySnakeInfo.id,
-                mySnakeInfo.score,
+                mySnakeInfo[INDEX_SNAKE_ID],
+                mySnakeInfo[INDEX_SNAKE_USERNAME],
+                Integer.valueOf(mySnakeInfo[INDEX_SNAKE_SCORE]),
                 new SnakeMouseInputComponent(),
                 new SnakePhysicsComponent(),
                 new SnakeGraphicsComponent(),
-                new Vector2D(mySnakeInfo.pos),
-                new Vector2D(mySnakeInfo.dir),
+                new Vector2D(Double.valueOf((mySnakeInfo[INDEX_SNAKE_POS_X])), Double.valueOf(mySnakeInfo[INDEX_SNAKE_POS_Y])),
+                new Vector2D(Double.valueOf((mySnakeInfo[INDEX_SNAKE_DIR_X])), Double.valueOf(mySnakeInfo[INDEX_SNAKE_DIR_Y])),
                 tailGraphicComponent
         );
         snakes.add(mySnake);
-        worldWidth = worldSizeInfo[0];
-        worldHeight = worldSizeInfo[1];
+        worldWidth = Double.valueOf(worldSizeInfo[0]);
+        worldHeight = Double.valueOf(worldSizeInfo[1]);
         othersSnakeInfo
                 .stream()
-                .filter(values -> !Objects.equals(values.id, mySnakeInfo.id))
+                .filter(values -> !Objects.equals(values[INDEX_SNAKE_ID], mySnakeInfo[INDEX_SNAKE_ID]))
                 .forEach(snakeInfo -> snakes.add(new Snake(
-                snakeInfo.id,
-                snakeInfo.score,
-                new SnakeNetworkInputComponent(),
-                new SnakePhysicsComponent(),
-                new SnakeNetworkGraphicsComponent(),
-                new Vector2D(snakeInfo.pos),
-                new Vector2D(snakeInfo.dir),
-                tailGraphicComponent
-        )));
+                        (String)snakeInfo[INDEX_SNAKE_ID],
+                        (String)snakeInfo[INDEX_SNAKE_USERNAME],
+                        Integer.parseInt(snakeInfo[INDEX_SNAKE_SCORE]),
+                        new SnakeNetworkInputComponent(),
+                        new SnakePhysicsComponent(),
+                        new SnakeNetworkGraphicsComponent(),
+                        new Vector2D(Double.parseDouble(snakeInfo[INDEX_SNAKE_POS_X]), Double.parseDouble(snakeInfo[INDEX_SNAKE_POS_Y])),
+                        new Vector2D(Double.parseDouble(snakeInfo[INDEX_SNAKE_DIR_X]), Double.parseDouble(snakeInfo[INDEX_SNAKE_DIR_Y])),
+                        tailGraphicComponent
+                )));
         foodInfo.forEach(oneFoodInfo -> foodList.add(new Food(
-                oneFoodInfo.id,
-                new Vector2D(oneFoodInfo.pos),
+                Integer.parseInt(oneFoodInfo[INDEX_SNAKE_FOOD_ID]),
+                new Vector2D(Double.parseDouble(oneFoodInfo[INDEX_SNAKE_FOOD_POS_X]), Double.parseDouble(oneFoodInfo[INDEX_SNAKE_FOOD_POS_Y])),
                 new FoodGraphicsComponent()
         )));
     }
@@ -63,8 +71,8 @@ public class InitInputEvent implements InputEvent {
     @Override
     public void applyEvent(IUpdatable updatable) {
         World world = (World) updatable;
-        world.setWidth((int)worldWidth);
-        world.setHeight((int)worldHeight);
+        world.setWidth((int) worldWidth);
+        world.setHeight((int) worldHeight);
 
         world.getSnakesOnMap().clear();
         world.setMySnakeID(mySnake.getID());

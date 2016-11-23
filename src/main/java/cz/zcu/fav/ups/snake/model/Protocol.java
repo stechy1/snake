@@ -17,9 +17,17 @@ public class Protocol {
     private static final String VALUE_DELIMITER = "\\|";
     private static final String INIT = "init";
     private static final String CHANGE_DIR = "changedir";
+    private static final String SYNC = "sync";
     private static final String ADD_SNAKE = "addsnake";
     private static final String REMOVE_SNAKE = "remsnake";
-    private static final String SYNC = "sync";
+
+    public static final int INDEX_SNAKE_ID = 0;
+    public static final int INDEX_SNAKE_USERNAME = 1;
+    public static final int INDEX_SNAKE_POS_X = 2;
+    public static final int INDEX_SNAKE_POS_Y = 3;
+    public static final int INDEX_SNAKE_DIR_X = 4;
+    public static final int INDEX_SNAKE_DIR_Y = 5;
+    public static final int INDEX_SNAKE_SCORE = 6;
 
     public static InputEvent parseEvent(String data) {
         final int delimiterIndex = data.indexOf(EVENT_DELIMITER);
@@ -30,19 +38,19 @@ public class Protocol {
             int indexOpenBracket = rawData.indexOf("{");
             int indexCloseBracket = rawData.indexOf("}");
             String snakeDataRaw = rawData.substring(indexOpenBracket + 1, indexCloseBracket);
-            SnakeInfo snakeInfo = buildSnakeInfo(snakeDataRaw);
+            String[] snakeInfo = parseValues(snakeDataRaw, VALUE_DELIMITER);
             rawData = rawData.substring(rawData.indexOf(SIZE) + SIZE.length() + 1);
             indexCloseBracket = rawData.indexOf("}");
             String sizeDataRaw = rawData.substring(0, indexCloseBracket);
-            double[] sizeInfo = parseValues(sizeDataRaw, VALUE_DELIMITER);
+            String[] sizeInfo = parseValues(sizeDataRaw, VALUE_DELIMITER);
             rawData = rawData.substring(rawData.indexOf(PLAYERS) + PLAYERS.length() + 1);
             indexCloseBracket = rawData.indexOf("}");
             String playersDataRaw = rawData.substring(0, indexCloseBracket);
-            List<SnakeInfo> playersInfo = parseSnakeInfoValues(playersDataRaw);
+            List<String[]> playersInfo = parseSnakeInfoValues(playersDataRaw);
             rawData = rawData.substring(rawData.indexOf(FOOD) + FOOD.length() + 1);
             indexCloseBracket = rawData.indexOf("}");
             String foodDataRaw = rawData.substring(0, indexCloseBracket);
-            List<FoodInfo> foodInfo = parseFoodInfoValues(foodDataRaw);
+            List<String[]> foodInfo = parseFoodInfoValues(foodDataRaw);
 
             return new InitInputEvent(snakeInfo, sizeInfo, playersInfo, foodInfo);
         } else if (data.contains(CHANGE_DIR)) {
@@ -54,7 +62,7 @@ public class Protocol {
             return new SnakeChangeDirectionInputEvent(uid, vector);
         } else if (data.contains(REMOVE_SNAKE)) {
             String rawData = data.substring(delimiterIndex);
-            final String uid = rawData.substring(rawData.indexOf("(") + 1, rawData.indexOf(")"));
+            final String uid = rawData.substring(rawData.indexOf("{") + 1, rawData.indexOf("}"));
 
             return new RemoveSnakeInputEvent(uid);
         } else if (data.contains(ADD_SNAKE)) {
@@ -62,7 +70,7 @@ public class Protocol {
             int indexOpenBracket = rawData.indexOf("{");
             int indexCloseBracket = rawData.indexOf("}");
             String rawSnakeInfo = rawData.substring(indexOpenBracket + 1, indexCloseBracket);
-            SnakeInfo snakeInfo = buildSnakeInfo(rawSnakeInfo);
+            String[] snakeInfo = parseValues(rawSnakeInfo, VALUE_DELIMITER);
 
             return new AddSnakeInputEvent(snakeInfo);
         } else if (data.contains(SYNC)) {
@@ -70,7 +78,7 @@ public class Protocol {
             int indexOpenBracket = rawData.indexOf("{");
             int indexCloseBracket = rawData.indexOf("}");
             String snakeDataRaw = rawData.substring(indexOpenBracket + 1, indexCloseBracket);
-            List<SnakeInfo> snakeInfo = parseSnakeInfoValues(snakeDataRaw);
+            List<String[]> snakeInfo = parseSnakeInfoValues(snakeDataRaw);
 
             return new SyncInputEvent(snakeInfo);
         } else
@@ -78,44 +86,26 @@ public class Protocol {
         throw new IllegalArgumentException("Nebyl rozeznán event: " + data);
     }
 
-    private static double[] parseValues(String rawData, String delimiter) {
+    private static String[] parseValues(String rawData, String delimiter) {
         rawData = rawData.replaceAll("\\[|\\]", "");
-        return Arrays.stream(rawData.split(delimiter))
-                .mapToDouble(Double::parseDouble)
-                .toArray();
+        return rawData.split(delimiter);
     }
 
-    private static String parseID(String source) {
-        return source.substring(source.indexOf("(") + 1, source.indexOf(")"));
-    }
-
-    private static List<SnakeInfo> parseSnakeInfoValues(String rawData) {
+    private static List<String[]> parseSnakeInfoValues(String rawData) {
         if (rawData.isEmpty()) {
             return new ArrayList<>();
         }
         String[] rawArray = rawData.split(",");
-        List<SnakeInfo> info = new ArrayList<>(rawArray.length);
-        Arrays.stream(rawArray).forEach(s -> info.add(buildSnakeInfo(s)));
+        List<String[]> info = new ArrayList<>(rawArray.length);
+        Arrays.stream(rawArray).forEach(s -> info.add(parseValues(s, VALUE_DELIMITER)));
         return info;
     }
 
-    private static SnakeInfo buildSnakeInfo(String rawData) {
-        String id = parseID(rawData);
-        String rawValueData = rawData.substring(rawData.indexOf(")") + 1);
-        double[] snakeRawInfo = parseValues(rawValueData, VALUE_DELIMITER);
-        return new SnakeInfo(id, snakeRawInfo);
-    }
-
-    private static List<FoodInfo> parseFoodInfoValues(String rawData) {
+    private static List<String[]> parseFoodInfoValues(String rawData) {
         String[] rawArray = rawData.split(",");
-        List<FoodInfo> info = new ArrayList<>(rawArray.length);
-        Arrays.stream(rawArray).forEach(s -> info.add(buildFoodInfo(s)));
+        List<String[]> info = new ArrayList<>(rawArray.length);
+        Arrays.stream(rawArray).forEach(s -> info.add(parseValues(s, VALUE_DELIMITER)));
         return info;
-    }
-
-    private static FoodInfo buildFoodInfo(String rawData) {
-        double[] foodRawInfo = parseValues(rawData, VALUE_DELIMITER);
-        return new FoodInfo(foodRawInfo);
     }
 
 }

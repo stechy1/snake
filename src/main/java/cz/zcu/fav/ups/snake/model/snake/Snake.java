@@ -43,21 +43,31 @@ public class Snake implements GameObject, IUpdatable {
     final GraphicsComponent tailGraphicsComponent;
 
     // Jednoznačný identifikátor hada
-    private String id;
+    private final String id;
+    // Jméno hada
+    private final String name;
     // Počet kusů ocasu
     private int score;
     // endregion
 
     // region Constructors
+
     /**
      * Vytvoří nového hada
      *
+     * @param id ID hada
+     * @param name Jméno hada
+     * @param score Skóre hada
      * @param inputComponent    {@link InputComponent} Komponenta starající se o aktualizaci směru objektu
      * @param physicsComponent  {@link PhysicsComponent} Komponenta starající se o logiku objektu
      * @param graphicsComponent {@link GraphicsComponent} Komponenta starající se o vykreslení objektu na plátno
+     * @param pos Vektor pozice hada
+     * @param dir Vektor směru hada
+     * @param tailGraphicsComponent Grafická komponenta starající se o vykreslení ocasu hada
      */
-    public Snake(String id, int score, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent, Vector2D pos, Vector2D dir, GraphicsComponent tailGraphicsComponent) {
+    public Snake(String id, String name, int score, InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent, Vector2D pos, Vector2D dir, GraphicsComponent tailGraphicsComponent) {
         this.id = id;
+        this.name = name;
         this.inputComponent = inputComponent;
         this.physicsComponent = physicsComponent;
         this.graphicsComponent = graphicsComponent;
