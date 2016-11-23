@@ -47,13 +47,14 @@ public class Protocol {
             return new InitInputEvent(snakeInfo, sizeInfo, playersInfo, foodInfo);
         } else if (data.contains(CHANGE_DIR)) {
             final String uid = data.substring(data.indexOf("(") + 1, data.indexOf(")"));
-            String rawData = data.substring(delimiterIndex + 1);
+            String rawData = data.substring(data.indexOf("[") + 1, data.indexOf("]"));
             String[] rawVectorArray = rawData.split(VALUE_DELIMITER);
             Vector2D vector = new Vector2D(Double.valueOf(rawVectorArray[0]), Double.valueOf(rawVectorArray[1]));
 
             return new SnakeChangeDirectionInputEvent(uid, vector);
         } else if (data.contains(REMOVE_SNAKE)) {
-            final String uid = data.substring(data.indexOf("(") + 1, data.indexOf(")"));
+            String rawData = data.substring(delimiterIndex);
+            final String uid = rawData.substring(rawData.indexOf("(") + 1, rawData.indexOf(")"));
 
             return new RemoveSnakeInputEvent(uid);
         } else if (data.contains(ADD_SNAKE)) {
