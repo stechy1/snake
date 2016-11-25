@@ -21,6 +21,7 @@ jfx {
     mainClass = 'cz.zcu.fav.ups.snake.App'
     vendor = 'Petr Štechmüller'
     additionalAppResources = 'src/main/resources'
+    jfxMainAppJarName = "snake.jar"
     //copyAdditionalAppResourcesToJar = true
 }
 
