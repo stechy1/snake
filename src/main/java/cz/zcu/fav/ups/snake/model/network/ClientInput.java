@@ -14,12 +14,14 @@ import java.io.InputStreamReader;
 @SuppressWarnings("InfiniteLoopStatement")
 public class ClientInput extends Thread {
 
-    private final IEventHandler eventHandler;
+    private final EventHandler eventHandler;
+    private final LostConnectionHandler lostConnectionHandler;
     private final BufferedReader reader;
     private boolean interupt = false;
 
-    public ClientInput(IEventHandler eventHandler, InputStream inputStream) {
+    public ClientInput(EventHandler eventHandler, LostConnectionHandler lostConnectionHandler, InputStream inputStream) {
         this.eventHandler = eventHandler;
+        this.lostConnectionHandler = lostConnectionHandler;
         this.reader = new BufferedReader(new InputStreamReader(inputStream));
     }
 
@@ -48,11 +50,19 @@ public class ClientInput extends Thread {
             e.printStackTrace();
         }
 
-        System.out.println("Sakra, dostal jsem se až na konec");
+        if (!interupt) {
+            if (lostConnectionHandler != null) {
+                lostConnectionHandler.handleLostConnection();
+            }
+        }
     }
 
-    public interface IEventHandler {
+    public interface EventHandler {
 
         void handleEvent(InputEvent event);
+    }
+
+    public interface LostConnectionHandler {
+        void handleLostConnection();
     }
 }

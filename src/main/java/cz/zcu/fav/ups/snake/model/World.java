@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Třída představující herní svět
  */
-public final class World implements ClientInput.IEventHandler, IUpdatable {
+public final class World implements IUpdatable {
 
     // region Constants
     // Globální proměnná představující měřítko, podle kterého se všem objektům upravují velikosti
@@ -59,6 +59,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     private boolean singleplayer = false;
     private boolean running = false;
     private String mySnakeID;
+    private LostConnectionListener lostConnectionListener;
     private ClientInput clientInput;
     private ClientOutput clientOutput;
     // endregion
@@ -82,6 +83,11 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
             foodOnMap.put(i, new Food(i, Vector2D.RANDOM(-width, -height, 2*width, 2*height), graphicsComponent));
         }
     }
+
+    private void handleLostConnection() {
+
+    }
+
     // endregion
 
     // region Public methods
@@ -210,10 +216,15 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     public void setMySnakeID(String mySnakeID) {
         this.mySnakeID = mySnakeID;
     }
+
+    public void setLostConnectionListener(LostConnectionListener lostConnectionListener) {
+
+        this.lostConnectionListener = lostConnectionListener;
+    }
+
     // endregion
 
-    @Override
-    public void handleEvent(InputEvent event) {
+    private void handleEvent(InputEvent event) {
         if (event.getType() == EventType.WORLD) {
             event.applyEvent(this);
         } else {
@@ -230,6 +241,14 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
         default void onConnectionFailed() {
         }
     }
+
+    public interface LostConnectionListener {
+        default void onConnectionLost() {}
+    }
+
+    private final ClientInput.LostConnectionHandler inputLostConnectionHandler = this::handleLostConnection;
+
+    private final ClientInput.EventHandler inputEventHandler = this::handleEvent;
 
     /**
      * Třída představující herní smyčku světa
@@ -364,7 +383,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                 InputStream input = client.getInputStream();
                 OutputStream output = client.getOutputStream();
 
-                clientInput = new ClientInput(World.this, input);
+                clientInput = new ClientInput(inputEventHandler, inputLostConnectionHandler, input);
                 clientOutput = new ClientOutput(outputEventQueue, new DataOutputStream(output));
 
                 // Přidám do event qeue přihlašovací event, který se zpracuje při spuštění vlákna

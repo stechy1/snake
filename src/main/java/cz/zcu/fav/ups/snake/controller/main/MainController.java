@@ -84,6 +84,7 @@ public class MainController implements Initializable, OnCloseHanler {
         debugBtn.disableProperty().bindBidirectional(disabled);
 
         world = new World(canvas);
+        world.setLostConnectionListener(lostConnectionListener);
     }
 
     // region Button handlers
@@ -153,6 +154,14 @@ public class MainController implements Initializable, OnCloseHanler {
             alert.setHeaderText("Chyba připojení.");
             alert.setContentText("Nepodařilo se navázat spojení se serverem.");
             alert.showAndWait();
+        }
+    };
+
+    private final World.LostConnectionListener lostConnectionListener = new World.LostConnectionListener() {
+        @Override
+        public void onConnectionLost() {
+            System.out.println("Bylo ztraceno spojení.");
+            System.out.println("Pracuji na obnově spojení...");
         }
     };
 
