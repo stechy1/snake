@@ -54,8 +54,8 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     private final List<Integer> foodToRemove = new ArrayList<>();
     // Příznak určující, zda-li se bude herní smyčka opakovat do nekonečna, nebo pouze jednou
     private boolean noLoop = false;
-    private int width = 100;
-    private int height = 100;
+    private int width = 200;
+    private int height = 200;
     private boolean singleplayer = false;
     private boolean running = false;
     private String mySnakeID;
@@ -79,7 +79,7 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
     private void generateFood() {
         GraphicsComponent graphicsComponent = new FoodGraphicsComponent();
         for (int i = 0; i < 100; i++) {
-            foodOnMap.put(i, new Food(i, Vector2D.RANDOM(-width, -height, 2 * width, 2 * height), graphicsComponent));
+            foodOnMap.put(i, new Food(i, Vector2D.RANDOM(-width, -height, 2*width, 2*height), graphicsComponent));
         }
     }
     // endregion
@@ -291,6 +291,9 @@ public final class World implements ClientInput.IEventHandler, IUpdatable {
                         snake.graphicsComponent.handleDraw(snake, graphics, divide);
                     });
             foodOnMap.forEach((uid, food) -> food.graphicsComponent.handleDraw(food, graphics, divide));
+
+            graphics.setStroke(Color.ORANGE);
+            graphics.strokeRect(-width, -height, 2*width, 2*height);
 
             snakesToAdd.forEach((sid, snake) -> {
                 snake.init(World.this);
