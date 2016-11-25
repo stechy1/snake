@@ -93,6 +93,13 @@ public class Snake implements GameObject, IUpdatable {
         events.addLast(event);
     }
 
+    public void incrementScore(int count) {
+        score += count;
+        for (int i = 0; i < count; i++) {
+            tailList.add(new Tail(pos, tailGraphicsComponent));
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("Snake{X: %s, Y: %s}", pos.x, pos.y);

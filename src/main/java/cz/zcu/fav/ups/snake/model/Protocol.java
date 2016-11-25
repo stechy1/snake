@@ -20,6 +20,7 @@ public class Protocol {
     private static final String SYNC = "sync";
     private static final String ADD_SNAKE = "addsnake";
     private static final String REMOVE_SNAKE = "remsnake";
+    private static final String EAT_FOOD = "eatfood";
 
     public static final int INDEX_SNAKE_ID = 0;
     public static final int INDEX_SNAKE_USERNAME = 1;
@@ -81,6 +82,14 @@ public class Protocol {
             List<String[]> snakeInfo = parseSnakeInfoValues(snakeDataRaw);
 
             return new SyncInputEvent(snakeInfo);
+        } else if (data.contains(EAT_FOOD)) {
+            String rawData = data.substring(delimiterIndex + 1);
+            int indexOpenBracket = rawData.indexOf("{");
+            int indexCloseBracket = rawData.indexOf("}");
+            String rawSnakeInfo = rawData.substring(indexOpenBracket + 1, indexCloseBracket);
+            String[] eatInfo = parseValues(rawSnakeInfo, VALUE_DELIMITER);
+
+            return new EatFoodInputEvent(eatInfo);
         } else
 
         throw new IllegalArgumentException("Nebyl rozeznán event: " + data);
@@ -102,6 +111,9 @@ public class Protocol {
     }
 
     private static List<String[]> parseFoodInfoValues(String rawData) {
+        if (rawData.isEmpty()) {
+            return new ArrayList<>();
+        }
         String[] rawArray = rawData.split(",");
         List<String[]> info = new ArrayList<>(rawArray.length);
         Arrays.stream(rawArray).forEach(s -> info.add(parseValues(s, VALUE_DELIMITER)));
