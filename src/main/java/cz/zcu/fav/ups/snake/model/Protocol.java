@@ -21,6 +21,7 @@ public class Protocol {
     private static final String ADD_SNAKE = "addsnake";
     private static final String REMOVE_SNAKE = "remsnake";
     private static final String EAT_FOOD = "eatfood";
+    private static final String GAME_OVER = "gameover";
 
     public static final int INDEX_SNAKE_ID = 0;
     public static final int INDEX_SNAKE_USERNAME = 1;
@@ -90,7 +91,12 @@ public class Protocol {
             String[] eatInfo = parseValues(rawSnakeInfo, VALUE_DELIMITER);
 
             return new EatFoodInputEvent(eatInfo);
-        } else
+        } else if (data.contains(GAME_OVER)) {
+            String rawData = data.substring(delimiterIndex);
+            final String uid = rawData.substring(rawData.indexOf("{") + 1, rawData.indexOf("}"));
+
+            return new GameOverInputEvent(uid);
+        }
 
         throw new IllegalArgumentException("Nebyl rozeznán event: " + data);
     }
