@@ -6,6 +6,7 @@ import cz.zcu.fav.ups.snake.model.snake.tail.Tail;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SCALED_SIZE;
@@ -25,7 +26,10 @@ public class SnakeNetworkGraphicsComponent implements GraphicsComponent {
         graphicsContext.setFill(Color.BLACK);
 
         List<Tail> tails = snake.tailList;
-        tails.forEach(tail -> tail.graphicsComponent.handleDraw(tail, graphicsContext, divide));
+        for (Iterator<Tail> tailIterator = tails.iterator(); tailIterator.hasNext(); ) {
+            Tail next = tailIterator.next();
+            next.graphicsComponent.handleDraw(next, graphicsContext, divide);
+        }
 
         graphicsContext.setFill(Color.GREEN);
         graphicsContext.fillOval(
