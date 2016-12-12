@@ -85,7 +85,10 @@ public final class World implements IUpdatable {
     }
 
     private void handleLostConnection() {
-
+        stop();
+        if (lostConnectionListener != null) {
+            lostConnectionListener.onConnectionLost();
+        }
     }
 
     // endregion

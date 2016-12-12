@@ -7,6 +7,7 @@ import cz.zcu.fav.ups.snake.model.World;
 import cz.zcu.fav.ups.snake.model.snake.*;
 import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
 import cz.zcu.fav.ups.snake.model.snake.tail.TailRainbowGraphicsComponent;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -160,8 +161,13 @@ public class MainController implements Initializable, OnCloseHanler {
     private final World.LostConnectionListener lostConnectionListener = new World.LostConnectionListener() {
         @Override
         public void onConnectionLost() {
-            System.out.println("Bylo ztraceno spojení.");
-            System.out.println("Pracuji na obnově spojení...");
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Chyba.");
+                alert.setHeaderText("Chyba připojení.");
+                alert.setContentText("Spojení bylo ztraceno. Zkuste to později");
+                alert.showAndWait();
+            });
         }
     };
 
