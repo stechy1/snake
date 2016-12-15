@@ -52,6 +52,7 @@ public final class World implements IUpdatable {
     private final Map<Integer, Food> foodOnMap = new HashMap<>();
     private final Map<Integer, Food> foodToAdd = new HashMap<>();
     private final List<Integer> foodToRemove = new ArrayList<>();
+    private final Object mutex = new Object();
     // Příznak určující, zda-li se bude herní smyčka opakovat do nekonečna, nebo pouze jednou
     private boolean noLoop = false;
     private int width = 200;
@@ -62,6 +63,8 @@ public final class World implements IUpdatable {
     private LostConnectionListener lostConnectionListener;
     private ClientInput clientInput;
     private ClientOutput clientOutput;
+    private int lostConnectionCounter = 0;
+
     // endregion
 
     // region Constructors
@@ -85,7 +88,13 @@ public final class World implements IUpdatable {
     }
 
     private void handleLostConnection() {
-        stop();
+        if (!running) {
+            return;
+        }
+
+        //stop();
+        loop.stop();
+        clear();
         if (lostConnectionListener != null) {
             lostConnectionListener.onConnectionLost();
         }
@@ -108,6 +117,9 @@ public final class World implements IUpdatable {
         outputEventQueue.clear();
         clientInput = null;
         clientOutput = null;
+        lostConnectionCounter = 0;
+        GraphicsContext graphics = canvas.getGraphicsContext2D();
+        graphics.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     /**
@@ -133,8 +145,6 @@ public final class World implements IUpdatable {
     public void stop() {
         loop.stop();
         localPort = -1;
-        GraphicsContext graphics = canvas.getGraphicsContext2D();
-        graphics.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     /**
@@ -228,6 +238,9 @@ public final class World implements IUpdatable {
     // endregion
 
     private void handleEvent(InputEvent event) {
+        synchronized (mutex) {
+            lostConnectionCounter = 0;
+        }
         if (event.getType() == EventType.WORLD) {
             event.applyEvent(this);
         } else {
@@ -271,6 +284,13 @@ public final class World implements IUpdatable {
 
         @Override
         public void handle(long now) {
+            synchronized (mutex) {
+                if (lostConnectionCounter > 100) {
+                    handleLostConnection();
+                } else {
+                    lostConnectionCounter++;
+                }
+            }
             final long elapsed = now - lastTime;
             lastTime = now;
             lag += elapsed;
