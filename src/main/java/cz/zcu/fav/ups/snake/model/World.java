@@ -92,7 +92,6 @@ public final class World implements IUpdatable {
             return;
         }
 
-        //stop();
         loop.stop();
         clear();
         if (lostConnectionListener != null) {
