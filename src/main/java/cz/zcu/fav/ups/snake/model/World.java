@@ -158,7 +158,9 @@ public final class World implements IUpdatable {
     public void debug(String message) {
         OutputEvent event = new DebugOutputEvent(message);
         outputEventQueue.add(event);
-        clientOutput.goWork();
+        if (clientOutput != null) {
+            clientOutput.goWork();
+        }
     }
 
     /**
