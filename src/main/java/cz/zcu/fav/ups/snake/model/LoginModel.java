@@ -3,10 +3,19 @@ package cz.zcu.fav.ups.snake.model;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 
+import java.util.Objects;
+import java.util.regex.Pattern;
+
 /**
  * jednoduchý model představující přihlašovací údaje k serveru
  */
 public class LoginModel {
+
+    private static final Pattern m = Pattern.compile(
+            "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
     private static final int FLAG_USERNAME = 1;
     private static final int FLAG_HOST = 2;
@@ -23,6 +32,9 @@ public class LoginModel {
         username.addListener(usernameListener);
         host.addListener(hostListener);
         port.addListener(portListener);
+        valid.addListener((observable, oldValue, newValue) -> {
+            System.out.println(newValue);
+        });
     }
 
     private void setValidityFlag(int flag, boolean value) {
@@ -54,7 +66,7 @@ public class LoginModel {
     };
 
     private final ChangeListener<String> hostListener = (observable, oldValue, newValue) -> {
-        if (newValue.isEmpty()) {
+        if (newValue.isEmpty() || !m.matcher(newValue).matches() && !Objects.equals(newValue, "localhost")) {
             System.out.println("Host je nevalidní: " + newValue);
             setValidityFlag(FLAG_HOST, true);
             setValid(false);
@@ -65,7 +77,8 @@ public class LoginModel {
     };
 
     private final ChangeListener<Number> portListener = (observable, oldValue, newValue) -> {
-        if (newValue.intValue() <= 1023 || newValue.intValue() > 51000) {
+        //if (newValue.intValue() <= 1023 || newValue.intValue() > 51000) {
+        if (newValue.intValue() >> 16 > 0) {
             System.out.println("Port je nevalidní: " + newValue);
             setValidityFlag(FLAG_PORT, true);
             setValid(false);

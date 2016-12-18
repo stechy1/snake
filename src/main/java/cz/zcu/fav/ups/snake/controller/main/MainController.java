@@ -75,7 +75,7 @@ public class MainController implements Initializable, OnCloseHanler {
         Bindings.bindBidirectional(hostTxtField.textProperty(), loginModel.hostProperty());
         Bindings.bindBidirectional(portNumField.numberProperty(), loginModel.portProperty());
 
-        startBtn.disableProperty().bind(Bindings.and(loginModel.validProperty().not(), connecting));
+        startBtn.disableProperty().bind(Bindings.or(loginModel.validProperty().not(), connecting));
         startBtn.disableProperty().addListener((observable, oldValue, newValue) -> {
                     System.out.println("Zmena stavu");
         });
@@ -95,9 +95,12 @@ public class MainController implements Initializable, OnCloseHanler {
      * @param actionEvent {@link ActionEvent}
      */
     public void handleStartBtn(ActionEvent actionEvent) {
+        if (connecting.get()) {
+            return;
+        }
+
         connecting.set(true);
         world.connect(loginModel, connectedListener);
-//        world.start();
     }
 
     /**

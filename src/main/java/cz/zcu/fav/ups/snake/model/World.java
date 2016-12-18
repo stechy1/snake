@@ -64,6 +64,7 @@ public final class World implements IUpdatable {
     private ClientInput clientInput;
     private ClientOutput clientOutput;
     private int lostConnectionCounter = 0;
+    private Socket client;
 
     // endregion
 
@@ -113,6 +114,13 @@ public final class World implements IUpdatable {
         foodOnMap.clear();
         foodToAdd.clear();
         foodToRemove.clear();
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         outputEventQueue.clear();
         clientInput = null;
         clientOutput = null;
@@ -286,7 +294,7 @@ public final class World implements IUpdatable {
         @Override
         public void handle(long now) {
             synchronized (mutex) {
-                if (lostConnectionCounter > 100) {
+                if (lostConnectionCounter > 500) {
                     handleLostConnection();
                 } else {
                     lostConnectionCounter++;
@@ -397,13 +405,24 @@ public final class World implements IUpdatable {
         @Override
         public void run() {
             try {
-                Socket client;
-                if (localPort != -1) {
-                    client = new Socket(InetAddress.getByName(loginModel.getHost()), loginModel.getPort(), InetAddress.getLocalHost(), localPort);
-                } else {
-                    client = new Socket(InetAddress.getByName(loginModel.getHost()), loginModel.getPort());
-                    localPort = client.getLocalPort();
-                }
+                Thread socketThread = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (localPort != -1) {
+                                client = new Socket(InetAddress.getByName(loginModel.getHost()), loginModel.getPort(), InetAddress.getLocalHost(), localPort);
+                            } else {
+                                client = new Socket(loginModel.getHost(), loginModel.getPort());
+                                localPort = client.getLocalPort();
+                            }
+                        } catch (Exception ex) {
+                            // TODO nevim co s tim :)
+                        }
+                    }
+                };
+                socketThread.start();
+                socketThread.join(3000);
+
                 InputStream input = client.getInputStream();
                 OutputStream output = client.getOutputStream();
 
@@ -416,12 +435,12 @@ public final class World implements IUpdatable {
                 clientInput.start();
                 clientOutput.start();
 
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Platform.runLater(() -> {
                     if (mListener != null) {
                         mListener.onConnectionFailed();
                     }
-                    ex.printStackTrace();
+                    System.out.println(ex.getMessage());
                 });
                 return;
             }

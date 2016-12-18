@@ -27,6 +27,7 @@ public class NumericField extends TextField {
     private void init() {
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setGroupingUsed(false);
+        format.setParseIntegerOnly(true);
         Bindings.bindBidirectional(textProperty(), number, new NumberStringConverter(format));
     }
 
