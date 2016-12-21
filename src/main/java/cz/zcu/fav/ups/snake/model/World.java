@@ -3,7 +3,6 @@ package cz.zcu.fav.ups.snake.model;
 import cz.zcu.fav.ups.snake.model.event.EventType;
 import cz.zcu.fav.ups.snake.model.event.InputEvent;
 import cz.zcu.fav.ups.snake.model.event.OutputEvent;
-import cz.zcu.fav.ups.snake.model.event.output.DebugOutputEvent;
 import cz.zcu.fav.ups.snake.model.event.output.LoginOutputEvent;
 import cz.zcu.fav.ups.snake.model.event.output.LogoutOutputEvent;
 import cz.zcu.fav.ups.snake.model.food.Food;
@@ -13,6 +12,8 @@ import cz.zcu.fav.ups.snake.model.network.ClientOutput;
 import cz.zcu.fav.ups.snake.model.snake.Snake;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -42,6 +43,8 @@ public final class World implements IUpdatable {
     public final Canvas canvas;
     // Kolekce odchozích eventů
     public final Queue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<>();
+
+    public final BooleanProperty playing = new SimpleBooleanProperty(false);
     // Herní smyčka
     private final MainLoop loop;
     // Kolekce všech objektů, které se můžou hýbat
@@ -53,12 +56,10 @@ public final class World implements IUpdatable {
     private final Map<Integer, Food> foodToAdd = new HashMap<>();
     private final List<Integer> foodToRemove = new ArrayList<>();
     private final Object mutex = new Object();
-    // Příznak určující, zda-li se bude herní smyčka opakovat do nekonečna, nebo pouze jednou
-    private boolean noLoop = false;
     private int width = 200;
     private int height = 200;
     private boolean singleplayer = false;
-    private boolean running = false;
+    //private boolean running = false;
     private String mySnakeID;
     private LostConnectionListener lostConnectionListener;
     private ClientInput clientInput;
@@ -89,7 +90,7 @@ public final class World implements IUpdatable {
     }
 
     private void handleLostConnection() {
-        if (!running) {
+        if (!playing.get()) {
             return;
         }
 
@@ -133,7 +134,7 @@ public final class World implements IUpdatable {
      * Spustí herní smyčku
      */
     public void start() {
-        if (running) {
+        if (playing.get()) {
             return;
         }
 
@@ -163,21 +164,6 @@ public final class World implements IUpdatable {
         loop.handle(time);
     }
 
-    public void debug(String message) {
-        OutputEvent event = new DebugOutputEvent(message);
-        outputEventQueue.add(event);
-        if (clientOutput != null) {
-            clientOutput.goWork();
-        }
-    }
-
-    /**
-     * Nastaví příznak aby se herní smyčka spustila pouze jednou
-     */
-    public void noLoop() {
-        noLoop = true;
-    }
-
     /**
      * Připojí hráče do hry
      *
@@ -186,15 +172,6 @@ public final class World implements IUpdatable {
      */
     public void connect(LoginModel loginModel, ConnectedListener listener) {
         new ConnectionThread(loginModel, listener).start();
-    }
-
-    public void simulateLostConnection() {
-        if (clientInput != null) {
-            clientInput.shutdown();
-        }
-        if (clientOutput != null) {
-            clientOutput.shutdown();
-        }
     }
 
     public void addSnake(Snake snake) {
@@ -358,23 +335,19 @@ public final class World implements IUpdatable {
 
             if (!singleplayer && clientOutput != null)
                 clientOutput.goWork();
-
-            if (noLoop) {
-                loop.stop();
-            }
         }
 
         @Override
         public void start() {
             lastTime = System.nanoTime();
-            running = true;
+            playing.setValue(true);
             super.start();
         }
 
         @Override
         public void stop() {
             super.stop();
-            if (running) {
+            if (playing.get()) {
                 LogoutOutputEvent event = new LogoutOutputEvent();
                 if (clientOutput != null) {
                     outputEventQueue.clear();
@@ -387,7 +360,7 @@ public final class World implements IUpdatable {
                     }
                 }
             }
-            running = false;
+            playing.setValue(false);
             clear();
         }
     }

@@ -2,11 +2,7 @@ package cz.zcu.fav.ups.snake.controller.main;
 
 import cz.zcu.fav.ups.snake.controller.OnCloseHanler;
 import cz.zcu.fav.ups.snake.model.LoginModel;
-import cz.zcu.fav.ups.snake.model.Vector2D;
 import cz.zcu.fav.ups.snake.model.World;
-import cz.zcu.fav.ups.snake.model.snake.*;
-import cz.zcu.fav.ups.snake.model.snake.tail.TailCircleGraphicsComponent;
-import cz.zcu.fav.ups.snake.model.snake.tail.TailRainbowGraphicsComponent;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -14,6 +10,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -33,6 +30,7 @@ public class MainController implements Initializable, OnCloseHanler {
     // Příznak který určuje, zda-li jsem ve stavu připojování do hry, či nikoliv
     private final BooleanProperty connecting = new SimpleBooleanProperty(false);
 
+
     // region FXML
     // Obalovací prvek pro canvas
     @FXML
@@ -48,15 +46,13 @@ public class MainController implements Initializable, OnCloseHanler {
     @FXML
     private Button startBtn;
     @FXML
+    private Button stopBtn;
+    @FXML
     private TextField nameTxtField;
     @FXML
     private TextField hostTxtField;
     @FXML
     private NumericField portNumField;
-    @FXML
-    private TextField debugger;
-    @FXML
-    private Button debugBtn;
     // endregion
 
     // Svět, ve kterém se hraje
@@ -75,17 +71,12 @@ public class MainController implements Initializable, OnCloseHanler {
         Bindings.bindBidirectional(hostTxtField.textProperty(), loginModel.hostProperty());
         Bindings.bindBidirectional(portNumField.numberProperty(), loginModel.portProperty());
 
-        startBtn.disableProperty().bind(Bindings.or(loginModel.validProperty().not(), connecting));
-        startBtn.disableProperty().addListener((observable, oldValue, newValue) -> {
-                    System.out.println("Zmena stavu");
-        });
-
-        BooleanProperty disabled = new SimpleBooleanProperty();
-        debugger.textProperty().addListener((observable, oldValue, newValue) -> disabled.setValue(newValue.isEmpty()));
-        debugBtn.disableProperty().bindBidirectional(disabled);
+        connecting.addListener((observable, oldValue, newValue) -> canvas.setCursor(newValue ? Cursor.WAIT : Cursor.DEFAULT));
 
         world = new World(canvas);
         world.setLostConnectionListener(lostConnectionListener);
+        startBtn.disableProperty().bind(Bindings.or(loginModel.validProperty().not(), Bindings.or(world.playing, connecting)));
+        stopBtn.disableProperty().bind(world.playing.not());
     }
 
     // region Button handlers
@@ -99,7 +90,7 @@ public class MainController implements Initializable, OnCloseHanler {
             return;
         }
 
-        connecting.set(true);
+        connecting.setValue(true);
         world.connect(loginModel, connectedListener);
     }
 
@@ -112,32 +103,6 @@ public class MainController implements Initializable, OnCloseHanler {
         world.stop();
     }
 
-    /**
-     * Akce, která se spustí při stisknutí tlačítka "stepBtn"
-     *
-     * @param actionEvent {@link ActionEvent}
-     */
-    public void handleStepBtn(ActionEvent actionEvent) {
-        world.step(System.nanoTime());
-    }
-
-    /**
-     * Akce, která se spustí při stisknutí tlačítka "noLoop"
-     *
-     * @param actionEvent {@link ActionEvent}
-     */
-    public void handleNoLoopBtn(ActionEvent actionEvent) {
-        world.noLoop();
-    }
-
-    /**
-     * Akce, která se spustí při stisknutí tlačítka "debug"
-     *
-     * @param actionEvent {@link ActionEvent}
-     */
-    public void handleDebugBtn(ActionEvent actionEvent) {
-        world.debug(debugger.getText());
-    }
     // endregion
 
     // Listener reagující na výsledek připojení klienta do hry
@@ -147,12 +112,12 @@ public class MainController implements Initializable, OnCloseHanler {
         public void onConnected() {
             world.start();
             canvas.requestFocus();
-            connecting.set(false);
+            connecting.setValue(false);
         }
 
         @Override
         public void onConnectionFailed() {
-            connecting.set(false);
+            connecting.setValue(false);
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Chyba.");
             alert.setHeaderText("Chyba připojení.");
@@ -180,16 +145,10 @@ public class MainController implements Initializable, OnCloseHanler {
     }
 
     public void handleSingleplayerBtn(ActionEvent actionEvent) {
-        Snake mySnake = new Snake("1", "MySnake", 500, new SnakeMouseInputComponent(), new SnakePhysicsComponent(), new SnakeGraphicsComponent(), new Vector2D(0, 50), Vector2D.RIGHT(), new TailCircleGraphicsComponent());
-        Snake opponen = new Snake("2", "Opponent", 50, new SnakeNetworkInputComponent(), new SnakePhysicsComponent(), new SnakeNetworkGraphicsComponent(), new Vector2D(0, 0), Vector2D.RIGHT(), new TailRainbowGraphicsComponent());
-
-        world.addSnake(opponen);
-        world.addSnake(mySnake);
-
-        world.startSingleplayer();
-    }
-
-    public void handleLostConnection(ActionEvent actionEvent) {
-        world.simulateLostConnection();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Chyba.");
+        alert.setHeaderText("Oznámení.");
+        alert.setContentText("Tato funkce ještě není implementována");
+        alert.showAndWait();
     }
 }

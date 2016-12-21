@@ -29,8 +29,8 @@ public class ClientInput extends Thread {
         interupt = true;
         try {
             reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -43,11 +43,11 @@ public class ClientInput extends Thread {
                     InputEvent event = Protocol.parseEvent(received);
                     eventHandler.handleEvent(event);
                 } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
+                    System.out.println(ex.getMessage());
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
         }
 
         if (!interupt) {
