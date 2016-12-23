@@ -5,6 +5,7 @@ import cz.zcu.fav.ups.snake.model.IUpdatable;
 import cz.zcu.fav.ups.snake.model.World;
 import cz.zcu.fav.ups.snake.model.event.EventType;
 import cz.zcu.fav.ups.snake.model.event.InputEvent;
+import cz.zcu.fav.ups.snake.model.snake.Snake;
 
 public class EatFoodInputEvent implements InputEvent {
 
@@ -23,7 +24,12 @@ public class EatFoodInputEvent implements InputEvent {
         World world = (World) updatable;
 
         world.removeFood(foodId);
-        world.getSnakesOnMap().get(clientId).incrementScore(EAT_FOOD_SCORE);
+        Snake snake = world.getSnakesOnMap().get(clientId);
+        if (snake == null) {
+            return;
+        }
+
+        snake.incrementScore(EAT_FOOD_SCORE);
     }
 
     @Override
