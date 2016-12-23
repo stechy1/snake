@@ -1,9 +1,12 @@
 package cz.zcu.fav.ups.snake.model.snake;
 
-import cz.zcu.fav.ups.snake.model.*;
+import cz.zcu.fav.ups.snake.model.GameObject;
+import cz.zcu.fav.ups.snake.model.PhysicsComponent;
+import cz.zcu.fav.ups.snake.model.Vector2D;
+import cz.zcu.fav.ups.snake.model.World;
 import cz.zcu.fav.ups.snake.model.snake.tail.Tail;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import static cz.zcu.fav.ups.snake.model.snake.Snake.SIZE;
 
@@ -24,13 +27,13 @@ public class SnakePhysicsComponent implements PhysicsComponent {
     @Override
     public void handlePhysics(GameObject object, long lag) {
         final Snake snake = (Snake) object;
-        final LinkedList<Tail> tails = snake.tailList;
+        final List<Tail> tails = snake.tailList;
 
         if (tails.size() > 0) {
-            tails.removeFirst();
+            tails.remove(0);
         }
 
-        tails.addLast(new Tail(snake.pos.copy(), snake.tailGraphicsComponent));
+        tails.add(new Tail(snake.pos.copy(), snake.tailGraphicsComponent));
 
         final Vector2D newPos = Vector2D.mul(snake.dir, snake.vel).mul(SIZE);
         snake.pos.add(newPos);

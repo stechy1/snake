@@ -36,7 +36,8 @@ public class Snake implements GameObject, IUpdatable {
     // Komponenta starající se o vykreslení objektu na plátno
     public final GraphicsComponent graphicsComponent;
     // Kolekce kousků těla hada
-    final LinkedList<Tail> tailList = new LinkedList<>();
+    //final LinkedList<Tail> tailList = new LinkedList<>();
+    final List<Tail> tailList = Collections.synchronizedList(new ArrayList<>());
     final LinkedList<InputEvent> events = new LinkedList<>();
 
     // Grafická komponenta starající se o vykreslení těla hada
